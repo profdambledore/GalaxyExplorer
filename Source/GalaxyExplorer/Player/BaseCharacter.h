@@ -12,6 +12,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "GameplayTagContainer.h"
 
 #include "BaseCharacter.generated.h"
 
@@ -52,8 +53,11 @@ protected:
 
 public:	
 	/// -- References
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "References")
 		APlayerController* PC;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "References")
+		class UInteractWidget* InteractWidget = nullptr;
 
 	/// -- Components
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
@@ -64,6 +68,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		USpringArmComponent* PlayerCameraSpringArm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+		UWidgetComponent* InteractWidgetComponent;
 
 	/// -- Interact Mode
 	// Bool to denote if in interact mode (true if in interact mode)
@@ -77,6 +84,15 @@ public:
 
 	/// Timer handle for handling the Quick Interact
 	FTimerHandle QuickInteractHandle;
+
+	// Trace Data
+	FVector	MouseWorldLocation;
+	FVector MouseWorldDirection;
+	FHitResult TraceHit = FHitResult(ForceInit);
+	float PlacementDistance = 1000;
+
+	// Pointer to last hit interactable
+	TSoftObjectPtr<class ABaseInteractable> LastInteractedObject;
 
 	/// -- Camera
 	// Bool to denote if in third person or first person (true if in third person)
@@ -96,13 +112,13 @@ public:
 
 	/// -- Focusing
 	// How much the camera fouses (changes Field of View) per update
-	float FocusMultiplier = 0.05;
+	float FocusMultiplier = 0.08;
 
 	// The percentage between the default and minimum FoV
 	float FocusLerp = 1.0f;
 
 	// The minimum FoV for focusing
-	float MinFocus = 60.0f;
+	float MinFocus = 50.0f;
 
 	// The interact modes FoV
 	float InteractModeFocus = 85.0f;

@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/BaseCharacter.h"
+#include "Player/InteractWidget.h"
 #include "BaseCharacter.h"
+#include "Interactables/BaseInteractable.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -22,9 +24,25 @@ ABaseCharacter::ABaseCharacter()
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Third Person Camera"));
 	ThirdPersonCamera->SetupAttachment(PlayerCameraSpringArm, USpringArmComponent::SocketName);
 
+	InteractWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Interact Widget Component"));
+
 	// Set the active camera
 	ThirdPersonCamera->SetActive(false, false);
 	FirstPersonCamera->SetActive(true, true);
+
+	// Get material object and store it
+	ConstructorHelpers::FObjectFinder<USkeletalMesh>CharacterMesh(TEXT(""));
+	if (CharacterMesh.Succeeded()) { GetMesh()->SetSkeletalMesh(CharacterMesh.Object); }
+
+	// Find InteractWidget object and store it
+	static ConstructorHelpers::FClassFinder<UUserWidget>UIClass(TEXT("/Game/Player/UI/WBP_InteractWidget"));
+	if (UIClass.Succeeded()) {
+		InteractWidgetComponent->SetWidgetClass(UIClass.Class);
+	};
+
+	// Set the InteractWidget to be hidden until needed
+	InteractWidgetComponent->SetVisibility(false, false);
+
 }
 
 // Called when the game starts or when spawned
@@ -34,7 +52,9 @@ void ABaseCharacter::BeginPlay()
 
 	// Get reference to the players controller
 	PC = Cast<APlayerController>(GetController());
-	
+
+	// Get reference to the interact widget class
+	InteractWidget = Cast<UInteractWidget>(InteractWidgetComponent->GetWidgetClass());	
 }
 
 // Called every frame
@@ -42,6 +62,44 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bInInteractMode) {
+		// Get cursor location in world space
+		PC->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection);
+
+		// Trace for interactables under the mouse
+		GetWorld()->LineTraceSingleByChannel(TraceHit, MouseWorldLocation, MouseWorldLocation + (MouseWorldDirection * PlacementDistance), ECC_WorldStatic, FCollisionQueryParams(FName("DistTrace"), true));
+
+		// First, check if the trace hit anything
+		if (TraceHit.Actor != nullptr) {
+			if (TraceHit.Actor->IsA(ABaseInteractable::StaticClass())) {
+				if (LastInteractedObject == nullptr) {
+					// Cast to the object
+					LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
+				}
+				else {
+					// Check if the LastInteractedObject and TraceHit.Actor are the same object
+					if (LastInteractedObject->GetName() == TraceHit.Actor->GetName()) {
+						// Don't cast again
+					}
+					else {
+						// Replace the pointer in LastInteractedObject with the new TraceHit->Actor
+						LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
+					}
+				}
+
+				// Update the location of the interactable widget and make it visible
+				InteractWidgetComponent->SetWorldLocation(LastInteractedObject->InteractionWidgetPos->GetComponentLocation());
+				InteractWidgetComponent->SetWorldRotation(LastInteractedObject->InteractionWidgetPos->GetComponentRotation());
+				InteractWidgetComponent->SetVisibility(true, true);
+
+			}
+			else {
+				// Set last hit object to nullptr and hide the interactable widget
+				LastInteractedObject = nullptr;
+				InteractWidgetComponent->SetVisibility(false, false);
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -54,11 +112,13 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("MoveY", this, &ABaseCharacter::MoveY);
 	PlayerInputComponent->BindAxis("CameraX", this, &ABaseCharacter::CameraX);
 	PlayerInputComponent->BindAxis("CameraY", this, &ABaseCharacter::CameraY);
-	PlayerInputComponent->BindAxis("ZoomCamera", this, &ABaseCharacter::ZoomThirdPersonCamera);
+	PlayerInputComponent->BindAxis("Zoom", this, &ABaseCharacter::ZoomThirdPersonCamera);
+	PlayerInputComponent->BindAxis("Zoom", this, &ABaseCharacter::FocusCamera);
 
 	// Add Action Binds
 	PlayerInputComponent->BindAction("InteractMode", IE_Pressed, this, &ABaseCharacter::InteractModePress);
 	PlayerInputComponent->BindAction("InteractMode", IE_Released, this, &ABaseCharacter::InteractModeRelease);
+	PlayerInputComponent->BindAction("SwapCamera", IE_Released, this, &ABaseCharacter::ToggleCameraMode);
 }
 
 // --- Movement ---
@@ -190,7 +250,9 @@ void ABaseCharacter::InteractModeRelease()
 	FirstPersonCamera->SetFieldOfView(DefaultFocus);
 
 	// Hide mouse cursor 
+	LastInteractedObject = nullptr;
 	PC->bShowMouseCursor = false;
+	InteractWidgetComponent->SetVisibility(false, false);
 }
 
 void ABaseCharacter::QuickInteract()

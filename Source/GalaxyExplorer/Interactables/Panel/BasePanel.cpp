@@ -3,3 +3,7 @@
 
 #include "Interactables/Panel/BasePanel.h"
 
+void ABasePanel::Interact(int InteractionValue, ABaseCharacter* Interactee)
+{
+	PanelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Panel Mesh"));
+}

@@ -13,6 +13,7 @@
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "GameplayTagContainer.h"
+#include "Components/WidgetInteractionComponent.h"
 
 #include "BaseCharacter.generated.h"
 
@@ -31,6 +32,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void AttachToInteractable(AActor* ActorToAttachTo);
+	void UpdateInteractWidget();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,7 +50,12 @@ protected:
 	// Action
 	void InteractModePress();
 	void InteractModeRelease();
+	void InteractModePrimaryPress();
+	void InteractModePrimaryRelease();
 	void ToggleCameraMode();
+
+	void JumpPress();
+	void JumpRelease();
 
 	/// -- Interact
 	void QuickInteract();
@@ -72,6 +81,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		UWidgetComponent* InteractWidgetComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+		UWidgetInteractionComponent* WidgetInteractionComponent;
+
 	/// -- Interact Mode
 	// Bool to denote if in interact mode (true if in interact mode)
 	bool bInInteractMode = false;
@@ -85,6 +97,11 @@ public:
 	/// Timer handle for handling the Quick Interact
 	FTimerHandle QuickInteractHandle;
 
+	// Pointer to object to lock too
+	AActor* InteractableLockedTo;
+
+	bool bIgnoreNextRelease;
+
 	// Trace Data
 	FVector	MouseWorldLocation;
 	FVector MouseWorldDirection;
@@ -93,6 +110,9 @@ public:
 
 	// Pointer to last hit interactable
 	TSoftObjectPtr<class ABaseInteractable> LastInteractedObject;
+
+	// Maximum distance that the player can be before auto-deattaching from an attached interactable
+	float DettachDistance = 250.0f;
 
 	/// -- Camera
 	// Bool to denote if in third person or first person (true if in third person)

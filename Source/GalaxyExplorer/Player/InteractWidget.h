@@ -17,7 +17,11 @@ class GALAXYEXPLORER_API UInteractWidget : public UUserWidget
 public:
 	virtual void SynchronizeProperties() override;
 
-	void UpdateInteractionList(TMap<int, FString>);
+	UFUNCTION(BlueprintImplementableEvent)
+		void UpdateInteractionList();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void ClearInteractionList();
 
 public:
 	// References
@@ -27,4 +31,11 @@ public:
 	// Components
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UListView* InteractList = nullptr;
+
+	// 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		TMap<int, FString> InterationMap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interactable")
+		class ABaseInteractable* InteractionFocused = nullptr;
 };

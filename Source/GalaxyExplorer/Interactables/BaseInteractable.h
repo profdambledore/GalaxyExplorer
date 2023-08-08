@@ -9,6 +9,8 @@
 
 #include "BaseInteractable.generated.h"
 
+class ABaseCharacter;
+
 UCLASS()
 class GALAXYEXPLORER_API ABaseInteractable : public AActor
 {
@@ -22,13 +24,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-		void Interact(int InteractionValue);
+		virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void Interact_Use();
+	void Interact_Lock(ABaseCharacter* Interactee);
+	void Interact_TurnOn(ABaseCharacter* Interactee);
 
 public:	
 	// Components
@@ -38,12 +41,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		USceneComponent* InteractionWidgetPos;
 
+	// Bool to denote if the player can lock to the interactable, currently unused
+	bool bLockPlayerToInteractable = false;
 
-	// How the player can interact with the interactable
+	// How the player can interact with the interactable if it is turned on
 	// int - the value associated with the interation (eg: use = 0, turn on = 1)
 	// FString - the display name of the interaction
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 		TMap<int, FString> InterationPoints;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		TMap<int, FString> InterationPointsPowerOff;
+
+	// -- Power
+	// Bool to denote if the interactable is currently in an on or off state
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
+		bool bPowerOn = true;
+
+	// Bool to denote if the interactable's power can be toggled
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
+		bool bPowerToggle = false;
 
 	// Gameplay Tag Container
 	FGameplayTagContainer TagContainer;

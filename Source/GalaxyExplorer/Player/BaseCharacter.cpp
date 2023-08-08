@@ -26,6 +26,10 @@ ABaseCharacter::ABaseCharacter()
 
 	InteractWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Interact Widget Component"));
 
+	WidgetInteractionComponent = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("Widget Interaction Component"));
+	WidgetInteractionComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 90.0f));
+	WidgetInteractionComponent->InteractionSource = EWidgetInteractionSource::CenterScreen;
+
 	// Set the active camera
 	ThirdPersonCamera->SetActive(false, false);
 	FirstPersonCamera->SetActive(true, true);
@@ -54,7 +58,8 @@ void ABaseCharacter::BeginPlay()
 	PC = Cast<APlayerController>(GetController());
 
 	// Get reference to the interact widget class
-	InteractWidget = Cast<UInteractWidget>(InteractWidgetComponent->GetWidgetClass());	
+	InteractWidget = Cast<UInteractWidget>(InteractWidgetComponent->GetWidget());	
+	InteractWidget->OwningPlayer = this;
 }
 
 // Called every frame
@@ -63,40 +68,55 @@ void ABaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (bInInteractMode) {
-		// Get cursor location in world space
-		PC->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection);
+		// Check if locked to an object
+		if (InteractableLockedTo) {
+			// If so, update the controllers rotation to look at said interactable
+			PC->SetControlRotation((GetActorLocation() - InteractableLockedTo->GetActorLocation()).Rotation() + FRotator(0.0f, 180.0f, 0.0f));
 
-		// Trace for interactables under the mouse
-		GetWorld()->LineTraceSingleByChannel(TraceHit, MouseWorldLocation, MouseWorldLocation + (MouseWorldDirection * PlacementDistance), ECC_WorldStatic, FCollisionQueryParams(FName("DistTrace"), true));
+			// Then check if the player has moved out of range.  If so, dettach.
+			if (FVector::Dist(GetActorLocation(), InteractableLockedTo->GetActorLocation()) > DettachDistance) {
+				InteractModeRelease();
+			}
+		}
+		else {
+			// Get cursor location in world space
+			PC->DeprojectMousePositionToWorld(MouseWorldLocation, MouseWorldDirection);
 
-		// First, check if the trace hit anything
-		if (TraceHit.Actor != nullptr) {
-			if (TraceHit.Actor->IsA(ABaseInteractable::StaticClass())) {
-				if (LastInteractedObject == nullptr) {
-					// Cast to the object
-					LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
-				}
-				else {
-					// Check if the LastInteractedObject and TraceHit.Actor are the same object
-					if (LastInteractedObject->GetName() == TraceHit.Actor->GetName()) {
-						// Don't cast again
+			// Trace for interactables under the mouse
+			GetWorld()->LineTraceSingleByChannel(TraceHit, MouseWorldLocation, MouseWorldLocation + (MouseWorldDirection * PlacementDistance), ECC_WorldStatic, FCollisionQueryParams(FName("DistTrace"), true));
+
+			// First, check if the trace hit anything
+			if (TraceHit.Actor != nullptr) {
+				if (TraceHit.Actor->IsA(ABaseInteractable::StaticClass())) {
+					if (LastInteractedObject == nullptr) {
+						// Cast to the object
+						LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
+						UpdateInteractWidget();
 					}
 					else {
-						// Replace the pointer in LastInteractedObject with the new TraceHit->Actor
-						LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
+						// Check if the LastInteractedObject and TraceHit.Actor are the same object
+						if (LastInteractedObject->GetName() == TraceHit.Actor->GetName()) {
+							// Don't cast again
+						}
+						else {
+							// Replace the pointer in LastInteractedObject with the new TraceHit->Actor
+							LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
+							UpdateInteractWidget();
+						}
 					}
+
+					// Update the location of the interactable widget and make it visible
+					InteractWidgetComponent->SetWorldLocation(LastInteractedObject->InteractionWidgetPos->GetComponentLocation());
+					InteractWidgetComponent->SetWorldRotation(LastInteractedObject->InteractionWidgetPos->GetComponentRotation());
+					InteractWidgetComponent->SetVisibility(true, true);
+
 				}
-
-				// Update the location of the interactable widget and make it visible
-				InteractWidgetComponent->SetWorldLocation(LastInteractedObject->InteractionWidgetPos->GetComponentLocation());
-				InteractWidgetComponent->SetWorldRotation(LastInteractedObject->InteractionWidgetPos->GetComponentRotation());
-				InteractWidgetComponent->SetVisibility(true, true);
-
-			}
-			else {
-				// Set last hit object to nullptr and hide the interactable widget
-				LastInteractedObject = nullptr;
-				InteractWidgetComponent->SetVisibility(false, false);
+				else {
+					// Set last hit object to nullptr and hide the interactable widget
+					LastInteractedObject = nullptr;
+					InteractWidgetComponent->SetVisibility(false, false);
+					InteractWidget->ClearInteractionList();
+				}
 			}
 		}
 	}
@@ -118,7 +138,11 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	// Add Action Binds
 	PlayerInputComponent->BindAction("InteractMode", IE_Pressed, this, &ABaseCharacter::InteractModePress);
 	PlayerInputComponent->BindAction("InteractMode", IE_Released, this, &ABaseCharacter::InteractModeRelease);
+	PlayerInputComponent->BindAction("InteractMode_Primary", IE_Pressed, this, &ABaseCharacter::InteractModePrimaryPress);
+	PlayerInputComponent->BindAction("InteractMode_Primary", IE_Released, this, &ABaseCharacter::InteractModePrimaryRelease);
 	PlayerInputComponent->BindAction("SwapCamera", IE_Released, this, &ABaseCharacter::ToggleCameraMode);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ABaseCharacter::JumpPress);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ABaseCharacter::JumpRelease);
 }
 
 // --- Movement ---
@@ -166,6 +190,16 @@ void ABaseCharacter::CameraY(float AxisValue)
 			AddControllerPitchInput(AxisValue);
 		}
 	}
+}
+
+void ABaseCharacter::JumpPress()
+{
+	ACharacter::Jump();
+}
+
+void ABaseCharacter::JumpRelease()
+{
+	ACharacter::StopJumping();
 }
 
 void ABaseCharacter::FocusCamera(float AxisValue)
@@ -222,6 +256,7 @@ void ABaseCharacter::ZoomThirdPersonCamera(float AxisValue)
 	}
 }
 
+// -- Interact Mode
 void ABaseCharacter::InteractModePress()
 {
 	bInInteractMode = true;
@@ -241,29 +276,72 @@ void ABaseCharacter::InteractModePress()
 
 void ABaseCharacter::InteractModeRelease()
 {
-	bInInteractMode = false;
+	if (!bIgnoreNextRelease) {
+		bInInteractMode = false;
 
-	// Reset bQuickInteract
-	bQuickInteract = false;
+		// Reset bQuickInteract
+		bQuickInteract = false;
 
-	// Reset focusing (if required)
-	FirstPersonCamera->SetFieldOfView(DefaultFocus);
+		// Reset focusing (if required)
+		FirstPersonCamera->SetFieldOfView(DefaultFocus);
 
-	// Hide mouse cursor 
-	LastInteractedObject = nullptr;
-	PC->bShowMouseCursor = false;
-	InteractWidgetComponent->SetVisibility(false, false);
+		InteractableLockedTo = nullptr;
+
+		// Hide mouse cursor 
+		LastInteractedObject = nullptr;
+		PC->bShowMouseCursor = false;
+		InteractWidgetComponent->SetVisibility(false, false);
+		InteractWidget->ClearInteractionList();
+	}
+	else {
+		bIgnoreNextRelease = false;
+	}
+}
+
+void ABaseCharacter::InteractModePrimaryPress()
+{
+	WidgetInteractionComponent->PressPointerKey(EKeys::LeftMouseButton);
+}
+
+void ABaseCharacter::InteractModePrimaryRelease()
+{
+	WidgetInteractionComponent->ReleasePointerKey(EKeys::LeftMouseButton);
 }
 
 void ABaseCharacter::QuickInteract()
 {
 	// Fire a trace.  If hit an interactable, complete first event
-	if (bQuickInteract) {
+	if (!bQuickInteract) {
 
 	}
 
 	// Reset bQuickInteract
 	bQuickInteract = false;
+}
+
+void ABaseCharacter::AttachToInteractable(AActor* ActorToAttachTo)
+{
+	// Ignore the next interact mode release, if required
+	// For example, when interacting with a panel
+	bIgnoreNextRelease = true;
+	InteractableLockedTo = ActorToAttachTo;
+
+	// Set last hit object to nullptr and hide the interactable widget
+	LastInteractedObject = nullptr;
+	InteractWidgetComponent->SetVisibility(false, false);
+}
+
+void ABaseCharacter::UpdateInteractWidget()
+{
+	InteractWidgetComponent->SetVisibility(true, true);
+	if (LastInteractedObject.Get()->bPowerOn == true) {
+		InteractWidget->InterationMap = LastInteractedObject->InterationPoints;
+	}
+	else {
+		InteractWidget->InterationMap = LastInteractedObject->InterationPointsPowerOff;
+	}
+	InteractWidget->UpdateInteractionList();
+	InteractWidget->InteractionFocused = LastInteractedObject.Get();
 }
 
 void ABaseCharacter::ToggleCameraMode()

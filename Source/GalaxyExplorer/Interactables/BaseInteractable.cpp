@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Player/BaseCharacter.h"
 #include "Interactables/BaseInteractable.h"
 
 // Sets default values
@@ -8,6 +8,7 @@ ABaseInteractable::ABaseInteractable()
 {
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	InteractionWidgetPos = CreateDefaultSubobject<USceneComponent>(TEXT("Interaction Widget Pos"));
+	InteractionWidgetPos->SetupAttachment(Root, "");
 
 	TagContainer.AddTag(FGameplayTag::RequestGameplayTag(FName("Interactable")));
 
@@ -29,21 +30,37 @@ void ABaseInteractable::Tick(float DeltaTime)
 
 }
 
-void ABaseInteractable::Interact(int InteractionValue)
+void ABaseInteractable::Interact(int InteractionValue, ABaseCharacter* Interactee)
 {
 	switch (InteractionValue) {
+	case -1:
+		UE_LOG(LogTemp, Warning, TEXT("Turn On"));
+		Interact_TurnOn(Interactee);
+		break;
+
 	case 0:
-		Interact_Use();
+		UE_LOG(LogTemp, Warning, TEXT("Case 0"));
+		Interact_Lock(Interactee);
 		break;
 
 	default:
+		UE_LOG(LogTemp, Warning, TEXT("Defaulted"));
 		break;
 	}
 
 }
 
-void ABaseInteractable::Interact_Use()
+void ABaseInteractable::Interact_Lock(ABaseCharacter* Interactee)
 {
+	Interactee->AttachToInteractable(this);
+}
 
+void ABaseInteractable::Interact_TurnOn(ABaseCharacter* Interactee)
+{
+	// Toggle the bool from false to true
+	bPowerOn = true;
+
+	// Then update the Interactees interaction widget
+	Interactee->UpdateInteractWidget();
 }
 

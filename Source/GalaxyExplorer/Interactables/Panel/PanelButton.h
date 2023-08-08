@@ -4,25 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Interactables/BaseInteractable.h"
-
-#include "Components/StaticMeshComponent.h"
-
-#include "BasePanel.generated.h"
+#include "PanelButton.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GALAXYEXPLORER_API ABasePanel : public ABaseInteractable
+class GALAXYEXPLORER_API APanelButton : public ABaseInteractable
 {
 	GENERATED_BODY()
 	
-
 public:
 	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 
-public:
-	// Components
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-		UStaticMeshComponent* PanelMesh = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Button Properties")
+		TArray<class ABaseInteractable*>LinkedInteractables;
 };

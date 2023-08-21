@@ -6,4 +6,7 @@
 void ABasePanel::Interact(int InteractionValue, ABaseCharacter* Interactee)
 {
 	PanelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Panel Mesh"));
+
+	PanelWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Panel Widget Component"));
+	PanelWidgetComponent->SetupAttachment(PanelMesh, "");
 }

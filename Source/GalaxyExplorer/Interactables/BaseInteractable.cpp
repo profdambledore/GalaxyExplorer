@@ -7,6 +7,7 @@
 ABaseInteractable::ABaseInteractable()
 {
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
 	InteractionWidgetPos = CreateDefaultSubobject<USceneComponent>(TEXT("Interaction Widget Pos"));
 	InteractionWidgetPos->SetupAttachment(Root, "");
 
@@ -62,5 +63,9 @@ void ABaseInteractable::Interact_TurnOn(ABaseCharacter* Interactee)
 
 	// Then update the Interactees interaction widget
 	Interactee->UpdateInteractWidget();
+}
+
+void ABaseInteractable::Interact_OnUnlock(ABaseCharacter* Interactee)
+{
 }
 

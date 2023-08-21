@@ -26,11 +26,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 
+	virtual void Interact_Lock(ABaseCharacter* Interactee);
+	virtual void Interact_OnUnlock(ABaseCharacter* Interactee);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void Interact_Lock(ABaseCharacter* Interactee);
+
 	void Interact_TurnOn(ABaseCharacter* Interactee);
 
 public:	

@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Interactables/Panel/BasePanel.h"
+
+#include "Components/WidgetComponent.h"
+
 #include "ShipManagerPanel.generated.h"
 
 class ABaseCharacter;
@@ -17,10 +20,23 @@ class GALAXYEXPLORER_API AShipManagerPanel : public ABasePanel
 public:
 	AShipManagerPanel();
 
-	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
+	virtual void BeginPlay() override;
+
+	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee) override;
+
+	void UpdateManagerWidget(int Index);
+
+	virtual void Interact_Lock(ABaseCharacter* Interactee) override;
+	virtual void Interact_OnUnlock(ABaseCharacter* Interactee) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "References")
+		class UShipManagerUI* ManagerWidget = nullptr;
 
 public:
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		USceneComponent* ShipSpawnLocation = nullptr;
+		USceneComponent* ShipSpawnComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+		UWidgetComponent* ManagerWidgetComponent;
 };

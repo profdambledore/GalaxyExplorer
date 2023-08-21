@@ -84,6 +84,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		UWidgetInteractionComponent* WidgetInteractionComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+		UShipInventoryComponent* ShipInventoryComponent;
+
 	/// -- Interact Mode
 	// Bool to denote if in interact mode (true if in interact mode)
 	bool bInInteractMode = false;

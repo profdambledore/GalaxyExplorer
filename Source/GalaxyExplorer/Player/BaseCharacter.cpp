@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/BaseCharacter.h"
-#include "Player/InteractWidget.h"
 #include "BaseCharacter.h"
+#include "Player/InteractWidget.h"
+#include "Player/ShipInventoryComponent.h"
 #include "Interactables/BaseInteractable.h"
 
 // Sets default values
@@ -29,6 +30,8 @@ ABaseCharacter::ABaseCharacter()
 	WidgetInteractionComponent = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("Widget Interaction Component"));
 	WidgetInteractionComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 90.0f));
 	WidgetInteractionComponent->InteractionSource = EWidgetInteractionSource::CenterScreen;
+
+	ShipInventoryComponent = CreateDefaultSubobject<UShipInventoryComponent>(TEXT("Ship Inventory Component"));
 
 	// Set the active camera
 	ThirdPersonCamera->SetActive(false, false);
@@ -285,6 +288,10 @@ void ABaseCharacter::InteractModeRelease()
 		// Reset focusing (if required)
 		FirstPersonCamera->SetFieldOfView(DefaultFocus);
 
+		if (InteractableLockedTo) {
+			Cast<ABaseInteractable>(InteractableLockedTo)->Interact_OnUnlock(this);
+		}
+		
 		InteractableLockedTo = nullptr;
 
 		// Hide mouse cursor 

@@ -6,6 +6,7 @@
 #include "Interactables/BaseInteractable.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/WidgetComponent.h"
 
 #include "BasePanel.generated.h"
 
@@ -25,4 +26,7 @@ public:
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		UStaticMeshComponent* PanelMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+		UWidgetComponent* PanelWidgetComponent;
 };

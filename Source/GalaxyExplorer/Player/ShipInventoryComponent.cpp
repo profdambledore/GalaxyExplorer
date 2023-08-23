@@ -19,6 +19,8 @@ void UShipInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FShipData TestShip(FString("Test Ship"), EShipManufacturer::Focalors, NULL, FString("In Storage"), FString("Doreville"), 0, 3, 1 );
+	AddShipToList(TestShip);
 	// ...
 	
 }
@@ -30,5 +32,15 @@ void UShipInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+TArray<FShipData> UShipInventoryComponent::GetPlayerShipList()
+{
+	return PlayerShipList;
+}
+
+void UShipInventoryComponent::AddShipToList(FShipData NewShip)
+{
+	PlayerShipList.Add(NewShip);
 }
 

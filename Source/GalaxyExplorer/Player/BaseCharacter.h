@@ -60,6 +60,9 @@ protected:
 	/// -- Interact
 	void QuickInteract();
 
+	// -- Ship Inventory
+	
+
 public:	
 	/// -- References
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "References")
@@ -85,7 +88,7 @@ public:
 		UWidgetInteractionComponent* WidgetInteractionComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-		UShipInventoryComponent* ShipInventoryComponent;
+		class UShipInventoryComponent* ShipInventoryComponent;
 
 	/// -- Interact Mode
 	// Bool to denote if in interact mode (true if in interact mode)
@@ -148,4 +151,5 @@ public:
 
 	// The default FoV
 	float DefaultFocus = 90.0f;
+
 };

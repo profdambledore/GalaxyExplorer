@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Interactables/Panel/ShipManagerPanel.h"
+
 #include "Player/BaseCharacter.h"
 #include "UI/ShipManagerUI.h"
-#include "Interactables/Panel/ShipManagerPanel.h"
 
 AShipManagerPanel::AShipManagerPanel() {
 
@@ -41,11 +42,12 @@ void AShipManagerPanel::UpdateManagerWidget(int Index)
 void AShipManagerPanel::Interact_Lock(ABaseCharacter* Interactee)
 {
 	Interactee->AttachToInteractable(this);
-	UE_LOG(LogTemp, Warning, TEXT("Updating Widget to"));
+	ManagerWidget->UpdateFleetList(Interactee);
 	UpdateManagerWidget(1);
 }
 
 void AShipManagerPanel::Interact_OnUnlock(ABaseCharacter* Interactee)
 {
+	ManagerWidget->ClearFleetList();
 	UpdateManagerWidget(0);
 }

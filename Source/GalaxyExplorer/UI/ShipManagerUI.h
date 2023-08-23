@@ -19,7 +19,7 @@ public:
 	virtual void SynchronizeProperties() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void UpdateFleetList();
+		void UpdateFleetList(class ABaseCharacter* Interactee);
 
 	UFUNCTION()
 		void ClearFleetList();

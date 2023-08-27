@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "StationManager.generated.h"
 
+class AShipManagerPanel;
+class UShipManagerUI;
+
 UCLASS()
 class GALAXYEXPLORER_API AStationManager : public AActor
 {
@@ -15,12 +18,33 @@ public:
 	// Sets default values for this actor's properties
 	AStationManager();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	class AStationSpawnLocation* GetSuitableSpawnLocation();
+
+	void SpawnShip();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// -- Components
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+		USceneComponent* Root = nullptr;
 
+	// -- Station Objects
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station Objects")
+		TArray<class AStationSpawnLocation*> SpawnLocations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station Objects")
+		TArray<class AFleetManagerPanel*> FleetManagers;
+
+	// -- Station Properties
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station Properties")
+		FString StationName = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station Properties")
+		FString StationCode = "";
 };

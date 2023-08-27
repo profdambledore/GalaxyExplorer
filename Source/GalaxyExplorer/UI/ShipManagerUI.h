@@ -7,6 +7,7 @@
 
 #include "Components/ListView.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/TextBlock.h"
 
 #include "ShipManagerUI.generated.h"
 
@@ -22,6 +23,9 @@ public:
 		void UpdateFleetList(class ABaseCharacter* Interactee);
 
 	UFUNCTION()
+		void UpdateStationDetails(FString InName, class AStationManager* InPointer);
+
+	UFUNCTION()
 		void ClearFleetList();
 
 	UFUNCTION()
@@ -32,11 +36,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "References")
 		class ABaseCharacter* OwningPlayer = nullptr;
 
+	UPROPERTY(BlueprintReadOnly, Category = "References")
+		class AStationManager* OwningStation = nullptr;
+
 	// Components
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UListView* FleetList = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UWidgetSwitcher* ManagerSwitcher = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+		class UTextBlock* StationName = nullptr;
 	
 };

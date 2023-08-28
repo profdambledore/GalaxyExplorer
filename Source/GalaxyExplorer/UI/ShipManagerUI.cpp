@@ -14,7 +14,7 @@ void UShipManagerUI::SynchronizeProperties()
 
 void UShipManagerUI::UpdateStationDetails(FString InName, AStationManager* InPointer)
 {
-	StationName->SetText(FText::FromString(InName));
+	StationName->SetText(FText::FromString("Welcome to " + InName));
 	OwningStation = InPointer;
 }
 

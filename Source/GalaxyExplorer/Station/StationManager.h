@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "Data/ShipData.h"
+
 #include "StationManager.generated.h"
 
 class AShipManagerPanel;
@@ -23,7 +26,8 @@ public:
 
 	class AStationSpawnLocation* GetSuitableSpawnLocation();
 
-	void SpawnShip();
+	UFUNCTION(BlueprintCallable)
+		FString SpawnShip(FShipData InShipData);
 
 protected:
 	// Called when the game starts or when spawned

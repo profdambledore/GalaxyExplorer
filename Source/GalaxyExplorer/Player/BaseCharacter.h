@@ -46,6 +46,7 @@ protected:
 	void CameraY(float AxisValue);
 	void FocusCamera(float AxisValue);
 	void ZoomThirdPersonCamera(float AxisValue);
+	void InteractModeScroll(float AxisValue);
 
 	// Action
 	void InteractModePress();

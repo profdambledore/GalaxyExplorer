@@ -31,6 +31,6 @@ void AStationSpawnLocation::Tick(float DeltaTime)
 
 AStationManager* AStationSpawnLocation::GetOwningStation()
 {
-	return nullptr;
+	return Station;
 }
 

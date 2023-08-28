@@ -29,7 +29,7 @@ ABaseCharacter::ABaseCharacter()
 
 	WidgetInteractionComponent = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("Widget Interaction Component"));
 	WidgetInteractionComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 90.0f));
-	WidgetInteractionComponent->InteractionSource = EWidgetInteractionSource::CenterScreen;
+	WidgetInteractionComponent->InteractionSource = EWidgetInteractionSource::Mouse;
 
 	ShipInventoryComponent = CreateDefaultSubobject<UShipInventoryComponent>(TEXT("Ship Inventory Component"));
 
@@ -137,6 +137,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("CameraY", this, &ABaseCharacter::CameraY);
 	PlayerInputComponent->BindAxis("Zoom", this, &ABaseCharacter::ZoomThirdPersonCamera);
 	PlayerInputComponent->BindAxis("Zoom", this, &ABaseCharacter::FocusCamera);
+	PlayerInputComponent->BindAxis("InteractModeScroll", this, &ABaseCharacter::InteractModeScroll);
 
 	// Add Action Binds
 	PlayerInputComponent->BindAction("InteractMode", IE_Pressed, this, &ABaseCharacter::InteractModePress);
@@ -313,6 +314,23 @@ void ABaseCharacter::InteractModePrimaryPress()
 void ABaseCharacter::InteractModePrimaryRelease()
 {
 	WidgetInteractionComponent->ReleasePointerKey(EKeys::LeftMouseButton);
+}
+
+
+void ABaseCharacter::InteractModeScroll(float AxisValue)
+{
+	if (AxisValue != 0 && bInInteractMode)
+	{
+		if (AxisValue == 1)
+		{
+			WidgetInteractionComponent->PressPointerKey(EKeys::MouseScrollUp);
+		}
+		else if (AxisValue == -1)
+		{
+			WidgetInteractionComponent->PressPointerKey(EKeys::MouseScrollDown);
+
+		}
+	}
 }
 
 void ABaseCharacter::QuickInteract()

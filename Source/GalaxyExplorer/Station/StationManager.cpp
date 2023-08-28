@@ -47,7 +47,15 @@ AStationSpawnLocation* AStationManager::GetSuitableSpawnLocation()
 	return nullptr;
 }
 
-void AStationManager::SpawnShip()
+FString AStationManager::SpawnShip(FShipData InShipData)
 {
+	// First, find a suitable spawn location
+	// If one isn't found, then return false
+	AStationSpawnLocation* FoundSpawnLocation = GetSuitableSpawnLocation();
+	if (!FoundSpawnLocation) {
+		return "x";
+	}
+	return FoundSpawnLocation->SpawnLocationName;
 }
+
 

@@ -32,4 +32,8 @@ public:
 	// -- Station 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")
 		class AStationManager* Station = nullptr;
+
+	// -- Spawn Location Details
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Location Details")
+		FString SpawnLocationName = "";
 };

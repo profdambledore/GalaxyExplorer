@@ -7,11 +7,11 @@ void APanelButton::Interact(int InteractionValue, ABaseCharacter* Interactee)
 {
 	switch (InteractionValue) {
 	case 0:
-		// Turn on
+		// Turn on linked interactables
 		for (int i = 0; i < LinkedInteractables.Num(); i++) {
-			LinkedInteractables[i]->bPowerOn = true;
+			LinkedInteractables[i]->SetEnabled(true);
 		}
-		bPowerOn = true;
+		bEnabled = true;
 
 		// Then update the Interactees interaction widget
 		Interactee->UpdateInteractWidget();
@@ -20,9 +20,9 @@ void APanelButton::Interact(int InteractionValue, ABaseCharacter* Interactee)
 	case 1:
 		// Turn off
 		for (int i = 0; i < LinkedInteractables.Num(); i++) {
-			LinkedInteractables[i]->bPowerOn = false;
+			LinkedInteractables[i]->SetEnabled(false);
 		}
-		bPowerOn = false;
+		bEnabled = false;
 
 		// Then update the Interactees interaction widget
 		Interactee->UpdateInteractWidget();

@@ -48,6 +48,9 @@ void AFleetManagerPanel::BeginPlay()
 	// Get the classes of the child actors
 	Panel = Cast<AShipManagerPanel>(PanelComponent->GetChildActor());
 	Button = Cast<APanelButton>(ButtonComponent->GetChildActor());
+
+	// Link the button to the panel
+	Button->LinkedInteractables.Add(Panel);
 }
 
 // Called every frame

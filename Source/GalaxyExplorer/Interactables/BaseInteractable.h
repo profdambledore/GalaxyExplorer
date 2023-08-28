@@ -29,12 +29,12 @@ public:
 	virtual void Interact_Lock(ABaseCharacter* Interactee);
 	virtual void Interact_OnUnlock(ABaseCharacter* Interactee);
 
+	void SetEnabled(bool bNewEnabled);
+	void SetRecievePower(bool bNewRecievePower);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-
-	void Interact_TurnOn(ABaseCharacter* Interactee);
 
 public:	
 	// Components
@@ -57,13 +57,13 @@ public:
 		TMap<int, FString> InterationPointsPowerOff;
 
 	// -- Power
-	// Bool to denote if the interactable is currently in an on or off state
+	// Bool to denote if the interactable is recieving power
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
-		bool bPowerOn = true;
+		bool bRecievingPower = true;
 
-	// Bool to denote if the interactable's power can be toggled
+	// Bool to denote if when the interactable is enabled
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
-		bool bPowerToggle = false;
+		bool bEnabled = true;
 
 	// Gameplay Tag Container
 	FGameplayTagContainer TagContainer;

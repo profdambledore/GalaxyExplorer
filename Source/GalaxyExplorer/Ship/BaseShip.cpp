@@ -25,3 +25,11 @@ void ABaseShip::Tick(float DeltaTime)
 
 }
 
+void ABaseShip::TurnShipOn()
+{
+}
+
+void ABaseShip::FlightReady()
+{
+}
+

@@ -15,12 +15,20 @@ public:
 	// Sets default values for this actor's properties
 	ABaseShip();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable)
+		void TurnShipOn();
+
+	UFUNCTION(BlueprintCallable)
+		void FlightReady();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
 
 };

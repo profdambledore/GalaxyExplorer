@@ -34,9 +34,6 @@ public:
 
 public:
 	// Components
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		USceneComponent* ShipSpawnComponent = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		UWidgetComponent* ManagerWidgetComponent;
 };

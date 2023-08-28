@@ -5,10 +5,8 @@
 #include "Player/BaseCharacter.h"
 #include "UI/ShipManagerUI.h"
 
-AShipManagerPanel::AShipManagerPanel() {
-
-	ShipSpawnComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Ship Spawn Location"));
-
+AShipManagerPanel::AShipManagerPanel() 
+{
 	ManagerWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Interact Widget Component"));
 	ManagerWidgetComponent->SetupAttachment(Root, "");
 

@@ -359,7 +359,7 @@ void ABaseCharacter::AttachToInteractable(AActor* ActorToAttachTo)
 void ABaseCharacter::UpdateInteractWidget()
 {
 	InteractWidgetComponent->SetVisibility(true, true);
-	if (LastInteractedObject.Get()->bPowerOn == true) {
+	if (LastInteractedObject.Get()->bEnabled == true) {
 		InteractWidget->InterationMap = LastInteractedObject->InterationPoints;
 	}
 	else {

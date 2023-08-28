@@ -34,22 +34,7 @@ void ABaseInteractable::Tick(float DeltaTime)
 
 void ABaseInteractable::Interact(int InteractionValue, ABaseCharacter* Interactee)
 {
-	switch (InteractionValue) {
-	case -1:
-		UE_LOG(LogTemp, Warning, TEXT("Turn On"));
-		Interact_TurnOn(Interactee);
-		break;
-
-	case 0:
-		UE_LOG(LogTemp, Warning, TEXT("Case 0"));
-		Interact_Lock(Interactee);
-		break;
-
-	default:
-		UE_LOG(LogTemp, Warning, TEXT("Defaulted"));
-		break;
-	}
-
+	// Nothing, implement in childs
 }
 
 void ABaseInteractable::Interact_Lock(ABaseCharacter* Interactee)
@@ -57,16 +42,21 @@ void ABaseInteractable::Interact_Lock(ABaseCharacter* Interactee)
 	Interactee->AttachToInteractable(this);
 }
 
-void ABaseInteractable::Interact_TurnOn(ABaseCharacter* Interactee)
-{
-	// Toggle the bool from false to true
-	bPowerOn = true;
-
-	// Then update the Interactees interaction widget
-	Interactee->UpdateInteractWidget();
-}
-
 void ABaseInteractable::Interact_OnUnlock(ABaseCharacter* Interactee)
 {
+}
+
+void ABaseInteractable::SetEnabled(bool bNewEnabled)
+{
+	// Toggle the bool from false to true
+	bEnabled = bNewEnabled;
+
+	UE_LOG(LogTemp, Warning, TEXT("SetEnabled"));
+}
+
+void ABaseInteractable::SetRecievePower(bool bNewRecievePower)
+{
+	// Toggle the bool from false to true
+	bRecievingPower = bNewRecievePower;
 }
 

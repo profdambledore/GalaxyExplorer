@@ -19,7 +19,7 @@ void UShipInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FShipData TestShip(FString("Test Ship"), EShipManufacturer::Focalors, NULL, FString("In Storage"), FString("Doreville"), 0, 3, 1 );
+	FShipData TestShip(FString("Test Ship"), EShipManufacturer::Focalors, NULL, EShipClassification::Medium, FString("In Storage"), FString("Doreville"), 0, 3, 1);
 	AddShipToList(TestShip);
 	// ...
 	

@@ -4,6 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "Components/StaticMeshComponent.h"
+
+#include "Data/ShipData.h"
+
 #include "BaseShip.generated.h"
 
 UCLASS()
@@ -29,6 +34,24 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	// -- Components
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		USceneComponent* Root;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UStaticMeshComponent* ShipMesh;
+
+	// -- Ship Data
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ship Data")
+		FShipData ShipData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TArray<class ABaseShipInteractable*> Interactables;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TArray<class UVTOLGimbal*> VTOLGimbals;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TArray<class ULandingGear*> LandingGears;
 
 };

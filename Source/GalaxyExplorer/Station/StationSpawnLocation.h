@@ -4,7 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "Components/BoxComponent.h"
+
+#include "Data/ShipData.h"
+#include "Data/ShipClassification.h"
+
 #include "StationSpawnLocation.generated.h"
+
+class ABaseShip;
 
 UCLASS()
 class GALAXYEXPLORER_API AStationSpawnLocation : public AActor
@@ -20,6 +28,19 @@ public:
 
 	class AStationManager* GetOwningStation();
 
+	// Overlap Functions
+	UFUNCTION()
+		void OnSCBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnSCEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		bool SpawnShipAtLocation(FShipData InShipData);
+
+	TEnumAsByte<EShipClassification> ReturnPadData();
+	bool PadNotInUse();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,11 +50,24 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 		USceneComponent* Root = nullptr;
 
-	// -- Station 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+		UBoxComponent* SpawnCollision = nullptr;
+
+	// -- References 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")
 		class AStationManager* Station = nullptr;
 
 	// -- Spawn Location Details
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Location Details")
 		FString SpawnLocationName = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Spawn Location Details")
+		TEnumAsByte<EShipClassification> PadMax;
+
+	// --  Queries
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Queries")
+		int Overlaps = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Queries")
+		bool bInUse = false;
 };

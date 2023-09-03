@@ -7,11 +7,12 @@ FShipData::FShipData()
 {
 
 }
-FShipData::FShipData(FString InName, TEnumAsByte<EShipManufacturer> InManufacturer, TSubclassOf<class ABaseShip> InClass, FString InStatus, FString InLocation, int InCargo, int InCargoMax, int InCrew)
+FShipData::FShipData(FString InName, TEnumAsByte<EShipManufacturer> InManufacturer, TSubclassOf<class ABaseShip> InClass, TEnumAsByte<EShipClassification> InClassification, FString InStatus, FString InLocation, int InCargo, int InCargoMax, int InCrew)
 {
 	Name = InName;
 	Manufacturer = InManufacturer;
 	Class = InClass;
+	Classification = InClassification;
 	Status = InStatus;
 	Location = InLocation;
 	Cargo = InCargo;

@@ -15,7 +15,6 @@ AStationManager::AStationManager()
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -42,19 +41,25 @@ void AStationManager::Tick(float DeltaTime)
 
 }
 
-AStationSpawnLocation* AStationManager::GetSuitableSpawnLocation()
+AStationSpawnLocation* AStationManager::GetSuitableSpawnLocation(TEnumAsByte<EShipClassification> InClass)
 {
+	for (int i = 0; i < SpawnLocations.Num(); i++) {
+		if (SpawnLocations[i]->ReturnPadData().GetValue() <= InClass.GetValue() && SpawnLocations[i]->PadNotInUse()) {
+			return SpawnLocations[i];
+		}
+	}
 	return nullptr;
 }
 
 FString AStationManager::SpawnShip(FShipData InShipData)
 {
-	// First, find a suitable spawn location
+	// First, search through the spawn locations array to find a suitable spawn location
 	// If one isn't found, then return false
-	AStationSpawnLocation* FoundSpawnLocation = GetSuitableSpawnLocation();
+	AStationSpawnLocation* FoundSpawnLocation = GetSuitableSpawnLocation(InShipData.Classification);
 	if (!FoundSpawnLocation) {
 		return "x";
 	}
+	FoundSpawnLocation->SpawnShipAtLocation(InShipData);
 	return FoundSpawnLocation->SpawnLocationName;
 }
 

@@ -61,9 +61,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
 		bool bRecievingPower = true;
 
-	// Bool to denote if when the interactable is enabled
+	// Bool to denote if the interactable is enabled
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
 		bool bEnabled = true;
+
+	// Bool to denote if interactable should be treated as always recieveing power.
+	// Some interactables (such as buttons) should always be able to be used 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
+		bool bIgnorePower = true;
 
 	// Gameplay Tag Container
 	FGameplayTagContainer TagContainer;

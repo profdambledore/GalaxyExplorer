@@ -22,6 +22,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void UpdateFleetList(class ABaseCharacter* Interactee);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Panel")
+		bool ToggleSpawnedShipWidget();
+
 	UFUNCTION()
 		void UpdateStationDetails(FString InName, class AStationManager* InPointer);
 
@@ -48,5 +51,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UTextBlock* StationName = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Strings")
+		FString HangarName = "";
+
+	UPROPERTY(BlueprintReadOnly, Category = "Properties")
+		float HangarPanelDelay = 5.0f;
 	
 };

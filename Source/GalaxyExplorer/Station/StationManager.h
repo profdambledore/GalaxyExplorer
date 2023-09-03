@@ -24,7 +24,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	class AStationSpawnLocation* GetSuitableSpawnLocation();
+	class AStationSpawnLocation* GetSuitableSpawnLocation(TEnumAsByte<EShipClassification> InClass);
 
 	UFUNCTION(BlueprintCallable)
 		FString SpawnShip(FShipData InShipData);

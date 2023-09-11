@@ -36,5 +36,8 @@ public:
 	//
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FShipData> PlayerShipList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray < class ABaseShip* > ShipsPointers;
 		
 };

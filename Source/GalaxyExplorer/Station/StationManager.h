@@ -11,6 +11,7 @@
 
 class AShipManagerPanel;
 class UShipManagerUI;
+class UShipInventoryComponent;
 
 UCLASS()
 class GALAXYEXPLORER_API AStationManager : public AActor
@@ -27,7 +28,7 @@ public:
 	class AStationSpawnLocation* GetSuitableSpawnLocation(TEnumAsByte<EShipClassification> InClass);
 
 	UFUNCTION(BlueprintCallable)
-		FString SpawnShip(FShipData InShipData);
+		FString SpawnShip(FShipData InShipData, int Index, UShipInventoryComponent* OwningInvent);
 
 protected:
 	// Called when the game starts or when spawned

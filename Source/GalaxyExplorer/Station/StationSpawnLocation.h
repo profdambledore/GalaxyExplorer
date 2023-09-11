@@ -13,6 +13,7 @@
 #include "StationSpawnLocation.generated.h"
 
 class ABaseShip;
+class UShipInventoryComponent;
 
 UCLASS()
 class GALAXYEXPLORER_API AStationSpawnLocation : public AActor
@@ -36,7 +37,7 @@ public:
 		void OnSCEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-		bool SpawnShipAtLocation(FShipData InShipData);
+		bool SpawnShipAtLocation(FShipData InShipData, int Index, UShipInventoryComponent* OwningInvent);
 
 	TEnumAsByte<EShipClassification> ReturnPadData();
 	bool PadNotInUse();

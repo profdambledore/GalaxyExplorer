@@ -5,6 +5,8 @@
 #include "Station/StationManager.h"
 #include "Ship/BaseShip.h"
 
+#include "Player/ShipInventoryComponent.h"
+
 // Sets default values
 AStationSpawnLocation::AStationSpawnLocation()
 {
@@ -51,7 +53,7 @@ void AStationSpawnLocation::OnSCEndOverlap(UPrimitiveComponent* OverlappedComp, 
 	Overlaps--;
 }
 
-bool AStationSpawnLocation::SpawnShipAtLocation(FShipData InShipData)
+bool AStationSpawnLocation::SpawnShipAtLocation(FShipData InShipData, int Index, UShipInventoryComponent* OwningInvent)
 {
 	// Spawn ship
 	FVector wL = SpawnCollision->GetComponentLocation();

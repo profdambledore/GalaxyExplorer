@@ -5,6 +5,7 @@
 #include "Interactables/Ship/BaseShipInteractable.h"
 #include "Ship/Gimbal/VTOLGimbal.h"
 #include "Ship/LandingGear.h"
+#include "Ship/ShipLight.h"
 
 // Sets default values
 ABaseShip::ABaseShip()
@@ -29,10 +30,32 @@ void ABaseShip::BeginPlay()
 
 	for (int i = 0; i < childActors.Num(); i++) {
 		if (childActors[i]->IsA(ABaseShipInteractable::StaticClass())) {
-			Cast<ABaseShipInteractable>(childActors[i])->SetOwningShip(this);
+			Interactables.Add(Cast<ABaseShipInteractable>(childActors[i]));
+			Interactables[i]->SetOwningShip(this);
 		}
 	}
-	
+
+	// Get all VTOL gimbals and add them to the array
+	TArray<UActorComponent*> foundGimbals;
+	foundGimbals = GetComponentsByClass(UVTOLGimbal::StaticClass());
+	for (int i = 0; i < foundGimbals.Num(); i++) {
+		VTOLGimbals.Add(Cast<UVTOLGimbal>(foundGimbals[i]));
+	}
+
+	// Get all ship lights and add them to the array
+	TArray<UActorComponent*> foundLights;
+	foundLights = GetComponentsByClass(ULightComponent::StaticClass());
+	for (int i = 0; i < foundLights.Num(); i++) {
+		if (foundLights[i]->ComponentHasTag("Exterior")) {
+			ExteriorLights.Add(Cast<ULightComponent>(foundLights[i]));
+		}
+		else if (foundLights[i]->ComponentHasTag("Interior")) {
+			InteriorLights.Add(Cast<ULightComponent>(foundLights[i]));
+		}
+		
+	}
+
+	ToggleExteriorLights();
 }
 
 // Called every frame
@@ -48,5 +71,29 @@ void ABaseShip::TurnShipOn()
 
 void ABaseShip::FlightReady()
 {
+}
+
+void ABaseShip::ToggleExteriorLights()
+{
+	bExLightsOn = !bExLightsOn;
+	for (int i = 0; i < ExteriorLights.Num(); i++) {
+		ExteriorLights[i]->SetVisibility(bExLightsOn);
+	}
+}
+
+void ABaseShip::ToggleInteriorLights()
+{
+	bInLightsOn = !bInLightsOn;
+	for (int i = 0; i < InteriorLights.Num(); i++) {
+		InteriorLights[i]->SetVisibility(bInLightsOn);
+	}
+}
+
+void ABaseShip::ToggleVTOLMode()
+{
+	bInVTOLMode = !bInVTOLMode;
+	for (int i = 0; i < VTOLGimbals.Num(); i++) {
+		VTOLGimbals[i]->ToggleVTOLMode(bInVTOLMode);
+	}
 }
 

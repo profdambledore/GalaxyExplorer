@@ -16,6 +16,8 @@ class GALAXYEXPLORER_API ABaseShipInteractable : public ABaseInteractable
 
 public:
 	void SetOwningShip(class ABaseShip* InShip);
+
+	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "References")

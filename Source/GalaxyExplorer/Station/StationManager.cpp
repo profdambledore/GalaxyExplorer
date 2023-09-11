@@ -8,6 +8,8 @@
 #include "Interactables/Panel/ShipManagerPanel.h"
 #include "UI/ShipManagerUI.h"
 
+#include "Player/ShipInventoryComponent.h"
+
 // Sets default values
 AStationManager::AStationManager()
 {
@@ -51,7 +53,7 @@ AStationSpawnLocation* AStationManager::GetSuitableSpawnLocation(TEnumAsByte<ESh
 	return nullptr;
 }
 
-FString AStationManager::SpawnShip(FShipData InShipData)
+FString AStationManager::SpawnShip(FShipData InShipData, int Index, UShipInventoryComponent* OwningInvent)
 {
 	// First, search through the spawn locations array to find a suitable spawn location
 	// If one isn't found, then return false
@@ -59,7 +61,7 @@ FString AStationManager::SpawnShip(FShipData InShipData)
 	if (!FoundSpawnLocation) {
 		return "x";
 	}
-	FoundSpawnLocation->SpawnShipAtLocation(InShipData);
+	FoundSpawnLocation->SpawnShipAtLocation(InShipData, Index, OwningInvent);
 	return FoundSpawnLocation->SpawnLocationName;
 }
 

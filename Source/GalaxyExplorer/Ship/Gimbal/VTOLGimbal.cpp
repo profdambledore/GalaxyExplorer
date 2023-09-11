@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Ship/Gimbal/VTOLGimbal.h"
 
 // Sets default values for this component's properties
@@ -10,6 +9,9 @@ UVTOLGimbal::UVTOLGimbal()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	ConstructorHelpers::FObjectFinder<UCurveFloat>CurveObj(TEXT("/Game/Ship/Data/VTOLRotationCurve"));
+	if (CurveObj.Succeeded()) { TimelineCurve = CurveObj.Object; }
+	
 	// ...
 }
 
@@ -19,8 +21,13 @@ void UVTOLGimbal::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	if (TimelineCurve) {
+		FOnTimelineFloat TimelineProgress;
+		TimelineProgress.BindUFunction(this, FName("RotationTimelineProgress"));
+		RotationTimeline.AddInterpFloat(TimelineCurve, TimelineProgress);
+		RotationTimeline.SetLooping(false);
+		//RotationTimeline.SetPlayRate(1 / VTOL_RotationSpeed);
+	}
 }
 
 
@@ -28,17 +35,26 @@ void UVTOLGimbal::BeginPlay()
 void UVTOLGimbal::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	RotationTimeline.TickTimeline(DeltaTime);
 	// ...
 }
 
 void UVTOLGimbal::ToggleVTOLMode(bool InVTOL)
 {
 	if (InVTOL) {
-		SetRelativeRotation(VTOL_Enabled);
+		RotationTimeline.Play();
+		UE_LOG(LogTemp, Warning, TEXT("Tog"));
 	}
 	else {
-		SetRelativeRotation(VTOL_Disabled);
+		UE_LOG(LogTemp, Warning, TEXT("Tog"));
+		RotationTimeline.Reverse();
 	}
+}
+
+void UVTOLGimbal::RotationTimelineProgress(float Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Progress"));
+	//CurrRot = FMath::Lerp(VTOL_Disabled.Vector(), VTOL_Enabled.Vector(), Value).Rotation();
+	SetWorldRotation(FMath::Lerp(VTOL_Disabled, VTOL_Enabled, Value));
 }
 

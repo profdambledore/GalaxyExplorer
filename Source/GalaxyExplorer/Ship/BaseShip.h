@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/LightComponent.h"
 
 #include "Data/ShipData.h"
 
@@ -28,6 +29,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void FlightReady();
+
+	UFUNCTION(BlueprintCallable)
+		void ToggleExteriorLights();
+
+	UFUNCTION(BlueprintCallable)
+		void ToggleInteriorLights();
+
+	UFUNCTION(BlueprintCallable)
+		void ToggleVTOLMode();
 
 protected:
 	// Called when the game starts or when spawned
@@ -54,4 +64,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class ULandingGear*> LandingGears;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TArray<class ULightComponent*> ExteriorLights;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TArray<class ULightComponent*> InteriorLights;
+
+	// -- Ship Actives
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
+		bool bLandingGearDown = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
+		bool bExLightsOn = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
+		bool bInLightsOn = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
+		bool bInVTOLMode = false;
 };

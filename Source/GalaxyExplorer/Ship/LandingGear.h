@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+
+#include "Components/TimelineComponent.h"
+
 #include "LandingGear.generated.h"
 
 
@@ -22,17 +25,29 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ToggleLandingGear(bool bInEnabled);
 
+	UFUNCTION()
+		void LandingGearTimelineProgress(float Value);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
 	// -- Gimbal Details
-	// Rotator for how the gimbal should be orientated when VTOL mode is disabled
+	// Transform for how the landing gear should be orientated when disabled
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gimbal Details")
-		FTransform GearDisabled;
+		FTransform Gear_Disabled;
 
-	// Rotator for how the gimbal should be orientated when VTOL mode is enabled
+	// Transform for how the landing gear should be orientated when enabled
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gimbal Details")
-		FTransform GearEnabled;
+		FTransform Gear_Enabled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gimbal Details")
+		float Gear_TransitionSpeed;
+
+	// -- Timeline
+	FTimeline LandingGearTimeline;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timeline Details")
+		UCurveFloat* TimelineCurve = nullptr;
 };

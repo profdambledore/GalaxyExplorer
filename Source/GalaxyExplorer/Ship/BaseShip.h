@@ -31,6 +31,9 @@ public:
 		void FlightReady();
 
 	UFUNCTION(BlueprintCallable)
+		void ToggleLandingGear();
+
+	UFUNCTION(BlueprintCallable)
 		void ToggleExteriorLights();
 
 	UFUNCTION(BlueprintCallable)

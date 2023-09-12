@@ -53,8 +53,6 @@ void UVTOLGimbal::ToggleVTOLMode(bool InVTOL)
 
 void UVTOLGimbal::RotationTimelineProgress(float Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Progress"));
-	//CurrRot = FMath::Lerp(VTOL_Disabled.Vector(), VTOL_Enabled.Vector(), Value).Rotation();
 	SetWorldRotation(FMath::Lerp(VTOL_Disabled, VTOL_Enabled, Value));
 }
 

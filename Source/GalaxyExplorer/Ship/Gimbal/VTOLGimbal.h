@@ -44,9 +44,6 @@ public:
 		FRotator VTOL_Enabled;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gimbal Details")
-		FRotator CurrRot;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gimbal Details")
 		float VTOL_RotationSpeed;
 
 	// -- Timeline

@@ -56,6 +56,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 		TMap<int, FString> InterationPointsPowerOff;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction Widget")
+		FRotator WidgetRotation = FRotator(0.0f, 0.0f, 0.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction Widget")
+		FVector WidgetScale = FVector(1.0f, 1.0f, 1.0f);
+
 	// -- Power
 	// Bool to denote if the interactable is recieving power
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")

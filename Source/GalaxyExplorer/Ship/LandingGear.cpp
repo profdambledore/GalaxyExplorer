@@ -10,6 +10,8 @@ ULandingGear::ULandingGear()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	ConstructorHelpers::FObjectFinder<UCurveFloat>CurveObj(TEXT("/Game/Ship/Data/VTOLRotationCurve"));
+	if (CurveObj.Succeeded()) { TimelineCurve = CurveObj.Object; }
 	// ...
 }
 
@@ -19,7 +21,13 @@ void ULandingGear::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	if (TimelineCurve) {
+		FOnTimelineFloat LandingGearTimelineProgress;
+		LandingGearTimelineProgress.BindUFunction(this, FName("LandingGearTimelineProgress"));
+		LandingGearTimeline.AddInterpFloat(TimelineCurve, LandingGearTimelineProgress);
+		LandingGearTimeline.SetLooping(false);
+		//RotationTimeline.SetPlayRate(1 / VTOL_RotationSpeed);
+	}
 	
 }
 
@@ -28,17 +36,23 @@ void ULandingGear::BeginPlay()
 void ULandingGear::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	LandingGearTimeline.TickTimeline(DeltaTime);
 }
 
 void ULandingGear::ToggleLandingGear(bool bInEnabled)
 {
 	if (bInEnabled) {
-		SetRelativeTransform(GearEnabled);
+		UE_LOG(LogTemp, Warning, TEXT("Call"));
+		LandingGearTimeline.Play();
 	}
 	else {
-		SetRelativeTransform(GearDisabled);
+		LandingGearTimeline.Reverse();
 	}
+}
+
+void ULandingGear::LandingGearTimelineProgress(float Value)
+{
+	SetRelativeLocation(FMath::Lerp(Gear_Disabled.GetLocation(), Gear_Enabled.GetLocation(), Value));
+	SetWorldRotation(FMath::Lerp(Gear_Disabled.GetRotation(), Gear_Enabled.GetRotation(), Value));
 }
 

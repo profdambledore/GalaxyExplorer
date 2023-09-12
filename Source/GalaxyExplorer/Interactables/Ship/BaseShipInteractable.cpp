@@ -36,6 +36,14 @@ void ABaseShipInteractable::Interact(int InteractionValue, ABaseCharacter* Inter
 		Interactee->UpdateInteractWidget();
 		break;
 
+	case 3:
+		// Toggle state of ship landing gear
+		OwningShip->ToggleLandingGear();
+
+		// Then update the Interactees interaction widget
+		Interactee->UpdateInteractWidget();
+		break;
+
 	default:
 		break;
 	}

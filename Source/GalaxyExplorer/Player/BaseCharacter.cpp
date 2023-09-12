@@ -110,7 +110,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 					// Update the location of the interactable widget and make it visible
 					InteractWidgetComponent->SetWorldLocation(LastInteractedObject->InteractionWidgetPos->GetComponentLocation());
-					InteractWidgetComponent->SetWorldRotation(LastInteractedObject->InteractionWidgetPos->GetComponentRotation());
+					InteractWidgetComponent->SetWorldRotation(LastInteractedObject->InteractionWidgetPos->GetComponentRotation() + LastInteractedObject->WidgetRotation);
 					InteractWidgetComponent->SetVisibility(true, true);
 
 				}
@@ -358,7 +358,9 @@ void ABaseCharacter::AttachToInteractable(AActor* ActorToAttachTo)
 
 void ABaseCharacter::UpdateInteractWidget()
 {
-	InteractWidgetComponent->SetVisibility(true, true);
+	//InteractWidgetComponent->SetRelativeRotation(LastInteractedObject->WidgetRotation);
+	InteractWidgetComponent->SetRelativeScale3D(LastInteractedObject->WidgetScale);
+
 	if (LastInteractedObject.Get()->bEnabled == true) {
 		InteractWidget->InterationMap = LastInteractedObject->InterationPoints;
 	}
@@ -367,6 +369,7 @@ void ABaseCharacter::UpdateInteractWidget()
 	}
 	InteractWidget->UpdateInteractionList();
 	InteractWidget->InteractionFocused = LastInteractedObject.Get();
+	InteractWidgetComponent->SetVisibility(true, true);
 }
 
 void ABaseCharacter::ToggleCameraMode()

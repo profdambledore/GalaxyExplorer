@@ -42,6 +42,13 @@ void ABaseShip::BeginPlay()
 		VTOLGimbals.Add(Cast<UVTOLGimbal>(foundGimbals[i]));
 	}
 
+	// Get all landing gears and add them to the array
+	TArray<UActorComponent*> foundLandingGears;
+	foundLandingGears = GetComponentsByClass(ULandingGear::StaticClass());
+	for (int i = 0; i < foundLandingGears.Num(); i++) {
+		LandingGears.Add(Cast<ULandingGear>(foundLandingGears[i]));
+	}
+
 	// Get all ship lights and add them to the array
 	TArray<UActorComponent*> foundLights;
 	foundLights = GetComponentsByClass(ULightComponent::StaticClass());
@@ -56,6 +63,7 @@ void ABaseShip::BeginPlay()
 	}
 
 	ToggleExteriorLights();
+	ToggleLandingGear();
 }
 
 // Called every frame
@@ -71,6 +79,14 @@ void ABaseShip::TurnShipOn()
 
 void ABaseShip::FlightReady()
 {
+}
+
+void ABaseShip::ToggleLandingGear()
+{
+	bLandingGearDown = !bLandingGearDown;
+	for (int i = 0; i < LandingGears.Num(); i++) {
+		LandingGears[i]->ToggleLandingGear(bLandingGearDown);
+	}
 }
 
 void ABaseShip::ToggleExteriorLights()

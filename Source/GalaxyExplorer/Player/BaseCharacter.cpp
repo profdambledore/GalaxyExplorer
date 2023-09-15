@@ -94,6 +94,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 					if (LastInteractedObject == nullptr) {
 						// Cast to the object
 						LastInteractedObject = Cast<ABaseInteractable>(TraceHit.Actor);
+						LastInteractedObject->OnCasted();
 						UpdateInteractWidget();
 					}
 					else {

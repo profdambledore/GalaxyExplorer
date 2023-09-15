@@ -28,6 +28,7 @@ public:
 
 	virtual void Interact_Lock(ABaseCharacter* Interactee);
 	virtual void Interact_OnUnlock(ABaseCharacter* Interactee);
+	virtual void OnCasted();
 
 	void SetEnabled(bool bNewEnabled);
 	void SetRecievePower(bool bNewRecievePower);

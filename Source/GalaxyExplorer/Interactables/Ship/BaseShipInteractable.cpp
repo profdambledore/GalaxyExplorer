@@ -44,7 +44,51 @@ void ABaseShipInteractable::Interact(int InteractionValue, ABaseCharacter* Inter
 		Interactee->UpdateInteractWidget();
 		break;
 
+	case 4:
+		// Toggle state of a tag name
+		OwningShip->ToggleMoveables(InteractableTags);
+		if (OwningShip->doorsOpen != 0) {
+			bEnabled = true;
+		}
+		else {
+			bEnabled = false;
+		}
+
+		// Then update the Interactees interaction widget
+		Interactee->UpdateInteractWidget();
+		break;
+
+	case 5:
+		// Close all doors if one or more is open, else open all doors
+		OwningShip->CloseAllDoors();
+		if (OwningShip->doorsOpen != 0) {
+			bEnabled = true;
+			UE_LOG(LogTemp, Warning, TEXT("TRUE"));
+		}
+		else {
+			bEnabled = false;
+			UE_LOG(LogTemp, Warning, TEXT("FALSE"));
+		}
+
+		// Then update the Interactees interaction widget
+		Interactee->UpdateInteractWidget();
+		break;
+
 	default:
 		break;
+	}
+}
+
+void ABaseShipInteractable::OnCasted()
+{
+	if (InterationPointsPowerOff.Num() != 0) {
+		if (OwningShip->doorsOpen != 0) {
+			bEnabled = true;
+			UE_LOG(LogTemp, Warning, TEXT("TRUE"));
+		}
+		else {
+			bEnabled = false;
+			UE_LOG(LogTemp, Warning, TEXT("FALSE"));
+		}
 	}
 }

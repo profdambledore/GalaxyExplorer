@@ -46,6 +46,10 @@ void ABaseInteractable::Interact_OnUnlock(ABaseCharacter* Interactee)
 {
 }
 
+void ABaseInteractable::OnCasted()
+{
+}
+
 void ABaseInteractable::SetEnabled(bool bNewEnabled)
 {
 	// Toggle the bool from false to true

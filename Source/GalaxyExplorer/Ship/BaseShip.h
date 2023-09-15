@@ -9,6 +9,7 @@
 #include "Components/LightComponent.h"
 
 #include "Data/ShipData.h"
+#include "Data/MoveablesList.h"
 
 #include "BaseShip.generated.h"
 
@@ -42,6 +43,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ToggleVTOLMode();
 
+	UFUNCTION(BlueprintCallable)
+		void ToggleMoveables(FName TagName);
+
+	UFUNCTION(BlueprintCallable)
+		void CloseAllDoors();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -73,6 +80,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class ULightComponent*> InteriorLights;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TMap < FName, FMoveablesList> Moveables;
+
 	// -- Ship Actives
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
 		bool bLandingGearDown = false;
@@ -85,4 +95,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
 		bool bInVTOLMode = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
+		int doorsOpen = 0;
 };

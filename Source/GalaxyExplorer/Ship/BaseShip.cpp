@@ -6,6 +6,7 @@
 #include "Ship/Gimbal/VTOLGimbal.h"
 #include "Ship/LandingGear.h"
 #include "Ship/ShipLight.h"
+#include "Ship/ShipMoveable.h"
 
 // Sets default values
 ABaseShip::ABaseShip()
@@ -62,6 +63,22 @@ void ABaseShip::BeginPlay()
 		
 	}
 
+	// Get all ShipMoveables and sort them in the Moveables map based on their tags
+	TArray<UActorComponent*> foundMoveables;
+	foundMoveables = GetComponentsByClass(UShipMoveable::StaticClass());
+	for (int i = 0; i < foundMoveables.Num(); i++) {
+		TArray<FName> tags = foundMoveables[i]->ComponentTags;
+		for (int j = 0; j < tags.Num(); j++) {
+			// Check if index in map exists.  If no, add a new index
+			if (Moveables.Contains(tags[j])) {
+				Moveables[tags[j]].Components.Add(Cast<UShipMoveable>(foundMoveables[i]));
+			}
+			else {
+				Moveables.Add(tags[j], FMoveablesList(Cast<UShipMoveable>(foundMoveables[i])));
+			}
+		}
+	}
+
 	ToggleExteriorLights();
 	ToggleLandingGear();
 }
@@ -110,6 +127,29 @@ void ABaseShip::ToggleVTOLMode()
 	bInVTOLMode = !bInVTOLMode;
 	for (int i = 0; i < VTOLGimbals.Num(); i++) {
 		VTOLGimbals[i]->ToggleVTOLMode(bInVTOLMode);
+	}
+}
+
+void ABaseShip::ToggleMoveables(FName TagName)
+{
+	FMoveablesList* moveablesToModify = Moveables.Find(TagName);
+	for (int i = 0; i < moveablesToModify->Components.Num(); i++) {
+		doorsOpen += moveablesToModify->Components[i]->ToggleMoveable(1);
+	}
+}
+
+void ABaseShip::CloseAllDoors()
+{
+	FMoveablesList* moveablesToModify = Moveables.Find("Doors");
+	int stateToSet = 3;
+	if (doorsOpen != 0) {
+		stateToSet = 2;
+	}
+	for (int i = 0; i < moveablesToModify->Components.Num(); i++) {
+		doorsOpen += moveablesToModify->Components[i]->ToggleMoveable(stateToSet);
+	}
+	if (doorsOpen < 0) {
+		doorsOpen = 0;
 	}
 }
 

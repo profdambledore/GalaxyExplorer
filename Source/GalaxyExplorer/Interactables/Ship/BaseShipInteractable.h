@@ -18,8 +18,12 @@ public:
 	void SetOwningShip(class ABaseShip* InShip);
 
 	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
+	virtual void OnCasted();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "References")
 		 ABaseShip* OwningShip = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+		FName InteractableTags;
 };

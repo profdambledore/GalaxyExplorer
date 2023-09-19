@@ -3,10 +3,13 @@
 #include "Data/ShipData.h"
 #include "Ship/BaseShip.h"
 
+// Default constructor
 FShipData::FShipData()
 {
 
 }
+
+// Constructor that allows initial inputs
 FShipData::FShipData(FString InName, TEnumAsByte<EShipManufacturer> InManufacturer, TSubclassOf<class ABaseShip> InClass, TEnumAsByte<EShipClassification> InClassification, FString InStatus, FString InLocation, int InCargo, int InCargoMax, int InCrew)
 {
 	Name = InName;
@@ -20,7 +23,7 @@ FShipData::FShipData(FString InName, TEnumAsByte<EShipManufacturer> InManufactur
 	Crew = InCrew;
 };
 
-
+// Default destructor
 FShipData::~FShipData()
 {
 

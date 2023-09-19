@@ -26,7 +26,7 @@ void ULandingGear::BeginPlay()
 		LandingGearTimelineProgress.BindUFunction(this, FName("LandingGearTimelineProgress"));
 		LandingGearTimeline.AddInterpFloat(TimelineCurve, LandingGearTimelineProgress);
 		LandingGearTimeline.SetLooping(false);
-		//RotationTimeline.SetPlayRate(1 / VTOL_RotationSpeed);
+		LandingGearTimeline.SetPlayRate(1 / Gear_TransitionSpeed);
 	}
 	
 }
@@ -53,6 +53,6 @@ void ULandingGear::ToggleLandingGear(bool bInEnabled)
 void ULandingGear::LandingGearTimelineProgress(float Value)
 {
 	SetRelativeLocation(FMath::Lerp(Gear_Disabled.GetLocation(), Gear_Enabled.GetLocation(), Value));
-	SetWorldRotation(FMath::Lerp(Gear_Disabled.GetRotation(), Gear_Enabled.GetRotation(), Value));
+	SetRelativeRotation(FMath::Lerp(Gear_Disabled.GetRotation(), Gear_Enabled.GetRotation(), Value));
 }
 

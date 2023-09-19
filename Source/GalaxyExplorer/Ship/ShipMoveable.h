@@ -22,11 +22,19 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// Play or reverse the MoveableTimeline to the inputted state
 	UFUNCTION(BlueprintCallable)
 		int ToggleMoveable(int State); // 1 = toggle, 2 = close, 3 = open
 
+	// Tick event for the timeline
 	UFUNCTION()
 		void MoveableTimelineProgress(float Value);
+
+	UFUNCTION()
+		void OnMoveableTimelineStart(bool bForward);
+
+	UFUNCTION()
+		void OnMoveableTimelineEnd(bool bForward);
 
 
 protected:
@@ -48,6 +56,7 @@ public:
 		float Movable_TransitionSpeed;
 
 	// -- Timeline
+	// The timeline object itself
 	FTimeline MoveableTimeline;
 
 	bool bMoveableActive = false;

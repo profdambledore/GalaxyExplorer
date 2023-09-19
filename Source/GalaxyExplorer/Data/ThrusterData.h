@@ -13,6 +13,7 @@ struct GALAXYEXPLORER_API FThrusterData
 public:
 	GENERATED_BODY();
 
+	// Constructors / Destructors 
 	FThrusterData();
 	~FThrusterData();
 };

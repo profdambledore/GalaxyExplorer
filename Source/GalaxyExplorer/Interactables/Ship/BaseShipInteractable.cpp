@@ -46,7 +46,7 @@ void ABaseShipInteractable::Interact(int InteractionValue, ABaseCharacter* Inter
 
 	case 4:
 		// Toggle state of a tag name
-		OwningShip->ToggleMoveables(InteractableTags);
+		OwningShip->ToggleMoveables(InteractableTags, true);
 		if (OwningShip->doorsOpen != 0) {
 			bEnabled = true;
 		}
@@ -69,7 +69,6 @@ void ABaseShipInteractable::Interact(int InteractionValue, ABaseCharacter* Inter
 			bEnabled = false;
 			UE_LOG(LogTemp, Warning, TEXT("FALSE"));
 		}
-
 		// Then update the Interactees interaction widget
 		Interactee->UpdateInteractWidget();
 		break;

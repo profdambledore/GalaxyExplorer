@@ -12,15 +12,18 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Setup the characters components
 	// Cameras
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("First Person Camera"));
 	FirstPersonCamera->SetRelativeLocation(FVector(10.0f, 0.0f, 90.0f));
 	FirstPersonCamera->bUsePawnControlRotation = true;
+	FirstPersonCamera->SetupAttachment(GetMesh() , "");
 
 	PlayerCameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Third Person Spring Arm"));
 	PlayerCameraSpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
 	PlayerCameraSpringArm->TargetArmLength = MinZoomValue + ((MaxZoomValue - MinZoomValue) / 2);
 	PlayerCameraSpringArm->bUsePawnControlRotation = 1;
+	PlayerCameraSpringArm->SetupAttachment(GetMesh(), "");
 
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Third Person Camera"));
 	ThirdPersonCamera->SetupAttachment(PlayerCameraSpringArm, USpringArmComponent::SocketName);
@@ -30,6 +33,7 @@ ABaseCharacter::ABaseCharacter()
 	WidgetInteractionComponent = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("Widget Interaction Component"));
 	WidgetInteractionComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 90.0f));
 	WidgetInteractionComponent->InteractionSource = EWidgetInteractionSource::Mouse;
+	WidgetInteractionComponent->SetupAttachment(FirstPersonCamera, "");
 
 	ShipInventoryComponent = CreateDefaultSubobject<UShipInventoryComponent>(TEXT("Ship Inventory Component"));
 
@@ -154,16 +158,33 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ABaseCharacter::MoveX(float AxisValue)
 {
 	if (AxisValue != 0) {
-		// Move on the X axis based on the input's axis value
-		AddMovementInput(GetActorForwardVector(), AxisValue, false);
+		// Check if we are in a seat.  If so...
+		if (!ShipSeatedIn)
+		{
+			// Move on the X axis based on the input's axis value
+			AddMovementInput(GetActorForwardVector(), AxisValue, false);
+		}
+		else
+		{
+
+		}
 	}
 }
 
 void ABaseCharacter::MoveY(float AxisValue)
 {
 	if (AxisValue != 0) {
-		// Move on the Y axis based on the input's axis value
-		AddMovementInput(GetActorRightVector(), AxisValue, false);
+		// Check if we are in a seat.  If so...
+		if (!ShipSeatedIn)
+		{
+			// Move on the Y axis based on the input's axis value
+			AddMovementInput(GetActorRightVector(), AxisValue, false);
+		}
+		else
+		{
+
+		}
+		
 	}
 }
 
@@ -199,18 +220,32 @@ void ABaseCharacter::CameraY(float AxisValue)
 
 void ABaseCharacter::JumpPress()
 {
-	ACharacter::Jump();
+	// Check if we are in a seat.  If not so...
+	if (!ShipSeatedIn)
+	{
+		// Make the character jump
+		ACharacter::Jump();
+	}
+	
 }
 
 void ABaseCharacter::JumpRelease()
 {
-	ACharacter::StopJumping();
+	// Check if we are in a seat.  If not so...
+	if (!ShipSeatedIn)
+	{
+		// Make the character stop jumping
+		ACharacter::StopJumping();
+	}
 }
+	
 
 void ABaseCharacter::FocusCamera(float AxisValue)
 {
+	// If the character is in Interact mode, then
 	if (AxisValue != 0 && bInInteractMode)
 	{
+		// If the input is positive, then zoom in
 		if (AxisValue == 1)
 		{
 			FocusLerp -= FocusMultiplier;
@@ -220,6 +255,7 @@ void ABaseCharacter::FocusCamera(float AxisValue)
 			}
 			
 		}
+		// If the input is negative, then zoom out
 		else if (AxisValue == -1)
 		{
 			FocusLerp += FocusMultiplier;
@@ -228,6 +264,8 @@ void ABaseCharacter::FocusCamera(float AxisValue)
 				FocusLerp = 1.0f;
 			}
 		}
+
+		// Set the FoV to the calculated percent via a lerp
 		FirstPersonCamera->SetFieldOfView(FMath::Lerp(MinFocus, InteractModeFocus, FocusLerp));
 	}
 }
@@ -266,6 +304,7 @@ void ABaseCharacter::InteractModePress()
 {
 	bInInteractMode = true;
 
+	// Clear any previous timers
 	GetWorld()->GetTimerManager().ClearTimer(QuickInteractHandle);
 
 	// Start Timer for Quick Interact
@@ -317,7 +356,7 @@ void ABaseCharacter::InteractModePrimaryRelease()
 	WidgetInteractionComponent->ReleasePointerKey(EKeys::LeftMouseButton);
 }
 
-
+// Doesnt work, fix
 void ABaseCharacter::InteractModeScroll(float AxisValue)
 {
 	if (AxisValue != 0 && bInInteractMode)
@@ -359,22 +398,42 @@ void ABaseCharacter::AttachToInteractable(AActor* ActorToAttachTo)
 
 void ABaseCharacter::UpdateInteractWidget()
 {
-	//InteractWidgetComponent->SetRelativeRotation(LastInteractedObject->WidgetRotation);
+	// Set the size of the widget to the LastInteractedObject's widget scale
 	InteractWidgetComponent->SetRelativeScale3D(LastInteractedObject->WidgetScale);
 
+	// Get the map of interation points based on if the object is enabled or not
 	if (LastInteractedObject.Get()->bEnabled == true) {
 		InteractWidget->InterationMap = LastInteractedObject->InterationPoints;
 	}
 	else {
 		InteractWidget->InterationMap = LastInteractedObject->InterationPointsPowerOff;
 	}
+
+	// Call function UpdateInteractionList and show the InteractWidgetComponent
 	InteractWidget->UpdateInteractionList();
 	InteractWidget->InteractionFocused = LastInteractedObject.Get();
 	InteractWidgetComponent->SetVisibility(true, true);
 }
 
+void ABaseCharacter::AttachToSeat(bool bAttach, ABaseShip* ShipAttachingTo)
+{
+	// If bAttach is true, attach to the seat and set the pointer
+	if (bAttach) {
+		ShipSeatedIn = ShipAttachingTo;
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	// If bAttach is false, deattach from the seat and clear the pointer to the ship
+	else {
+		ShipSeatedIn = nullptr;
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+}
+
 void ABaseCharacter::ToggleCameraMode()
 {
+	// If the character is in first person, swap to third person
 	if (bInThirdPerson == false)
 	{
 		FirstPersonCamera->SetActive(false, false);
@@ -382,6 +441,7 @@ void ABaseCharacter::ToggleCameraMode()
 
 		bInThirdPerson = true;
 	}
+	// If the character is in third person, swap to first person
 	else if (bInThirdPerson == true) {
 		FirstPersonCamera->SetActive(true, true);
 		ThirdPersonCamera->SetActive(false, false);

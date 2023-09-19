@@ -26,7 +26,7 @@ void UVTOLGimbal::BeginPlay()
 		TimelineProgress.BindUFunction(this, FName("RotationTimelineProgress"));
 		RotationTimeline.AddInterpFloat(TimelineCurve, TimelineProgress);
 		RotationTimeline.SetLooping(false);
-		//RotationTimeline.SetPlayRate(1 / VTOL_RotationSpeed);
+		RotationTimeline.SetPlayRate(1 / VTOL_RotationSpeed);
 	}
 }
 
@@ -53,6 +53,6 @@ void UVTOLGimbal::ToggleVTOLMode(bool InVTOL)
 
 void UVTOLGimbal::RotationTimelineProgress(float Value)
 {
-	SetWorldRotation(FMath::Lerp(VTOL_Disabled, VTOL_Enabled, Value));
+	SetRelativeRotation(FMath::Lerp(VTOL_Disabled, VTOL_Enabled, Value));
 }
 

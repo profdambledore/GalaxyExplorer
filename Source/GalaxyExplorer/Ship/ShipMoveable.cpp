@@ -10,6 +10,7 @@ UShipMoveable::UShipMoveable()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	// Find and store the timelines curve
 	ConstructorHelpers::FObjectFinder<UCurveFloat>CurveObj(TEXT("/Game/Ship/Data/VTOLRotationCurve"));
 	if (CurveObj.Succeeded()) { TimelineCurve = CurveObj.Object; }
 	// ...
@@ -21,12 +22,15 @@ void UShipMoveable::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Setup the timeline
 	if (TimelineCurve) {
 		FOnTimelineFloat MoveableTimelineProgress;
 		MoveableTimelineProgress.BindUFunction(this, FName("MoveableTimelineProgress"));
 		MoveableTimeline.AddInterpFloat(TimelineCurve, MoveableTimelineProgress);
 		MoveableTimeline.SetLooping(false);
-		//RotationTimeline.SetPlayRate(1 / VTOL_RotationSpeed);
+
+		// Set the timeline speed to play in the inputted speed
+		MoveableTimeline.SetPlayRate(1 / Movable_TransitionSpeed);
 	}
 	
 }
@@ -36,12 +40,15 @@ void UShipMoveable::BeginPlay()
 void UShipMoveable::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// Tick the timeline
 	MoveableTimeline.TickTimeline(DeltaTime);
 	
 }
 
 int UShipMoveable::ToggleMoveable(int State)
 {
+	// If State = 1, then toggle the timeline
 	if (State == 1) {
 		bMoveableActive = !bMoveableActive;
 		if (bMoveableActive) {
@@ -53,12 +60,14 @@ int UShipMoveable::ToggleMoveable(int State)
 			return -1;
 		}
 	}
+	// If State = 2, then reverse the timeline, even if it has already reached the start
 	else if (State == 2) {
 		bMoveableActive = false;
 		MoveableTimeline.Reverse();
 		return -1;
 
 	}
+	// If State = 3, then play the timeline, even if it has already reached the end
 	else if (State == 3) {
 		bMoveableActive = true;
 		MoveableTimeline.Play();
@@ -69,7 +78,16 @@ int UShipMoveable::ToggleMoveable(int State)
 
 void UShipMoveable::MoveableTimelineProgress(float Value)
 {
+	// Lerp between the two location and rotation values set on the movable object
 	SetRelativeLocation(FMath::Lerp(Movable_Disabled.GetLocation(), Movable_Enabled.GetLocation(), Value));
-	SetWorldRotation(FMath::Lerp(Movable_Disabled.GetRotation(), Movable_Enabled.GetRotation(), Value));
+	SetRelativeRotation(FMath::Lerp(Movable_Disabled.GetRotation(), Movable_Enabled.GetRotation(), Value));
+}
+
+void UShipMoveable::OnMoveableTimelineStart(bool bForward)
+{
+}
+
+void UShipMoveable::OnMoveableTimelineEnd(bool bForward)
+{
 }
 

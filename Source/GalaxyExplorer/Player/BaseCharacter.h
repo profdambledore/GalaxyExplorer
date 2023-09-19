@@ -14,6 +14,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayTagContainer.h"
 #include "Components/WidgetInteractionComponent.h"
+#include "Components/CapsuleComponent.h"
 
 #include "BaseCharacter.generated.h"
 
@@ -34,6 +35,8 @@ public:
 
 	void AttachToInteractable(AActor* ActorToAttachTo);
 	void UpdateInteractWidget();
+
+	void AttachToSeat(bool bAttach, class ABaseShip* ShipAttachingTo);
 
 protected:
 	// Called when the game starts or when spawned
@@ -152,5 +155,9 @@ public:
 
 	// The default FoV
 	float DefaultFocus = 90.0f;
+
+	/// -- Ship
+	// The ship this player is currently seated in
+	ABaseShip* ShipSeatedIn;
 
 };

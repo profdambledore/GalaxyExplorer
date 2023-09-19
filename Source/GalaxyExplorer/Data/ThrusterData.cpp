@@ -2,12 +2,13 @@
 
 #include "Data/ThrusterData.h"
 
-
+// Default constructor
 FThrusterData::FThrusterData()
 {
 
 };
 
+// Default destructor
 FThrusterData::~FThrusterData()
 {
 

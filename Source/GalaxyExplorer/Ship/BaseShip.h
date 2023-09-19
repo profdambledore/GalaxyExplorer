@@ -31,21 +31,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void FlightReady();
 
-	UFUNCTION(BlueprintCallable)
+	/// -- Toggles
+	// Toggles the state of all landing gears
+	UFUNCTION()
 		void ToggleLandingGear();
 
-	UFUNCTION(BlueprintCallable)
+	// Toggles the state of all exterior lights
+	UFUNCTION()
 		void ToggleExteriorLights();
 
-	UFUNCTION(BlueprintCallable)
+	// Toggles the state of all interior lights
+	UFUNCTION()
 		void ToggleInteriorLights();
 
-	UFUNCTION(BlueprintCallable)
+	// Toggles the state of all VTOL gimbals
+	UFUNCTION()
 		void ToggleVTOLMode();
 
-	UFUNCTION(BlueprintCallable)
-		void ToggleMoveables(FName TagName);
+	// Toggles the state of all Movables of the inputted category
+	UFUNCTION()
+		void ToggleMoveables(FName TagName, bool bIsDoor);
 
+	// Toggles the state of all doors to be closed if one is open, or open if all are closed
 	UFUNCTION(BlueprintCallable)
 		void CloseAllDoors();
 
@@ -54,48 +61,67 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// -- Components
+	/// -- Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USceneComponent* Root;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* ShipMesh;
 
-	// -- Ship Data
+	/// -- Ship Data
+	// The data struct of the ship
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ship Data")
 		FShipData ShipData;
 
+	// Array of all interactables located in the ship
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class ABaseShipInteractable*> Interactables;
 
+	// Array of all VTOL Gimbals objects
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class UVTOLGimbal*> VTOLGimbals;
 
+	// Array of all Landing Gear objects
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class ULandingGear*> LandingGears;
 
+	// Array of all exterior light objects
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class ULightComponent*> ExteriorLights;
 
+	// Array of all interior light objects
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TArray<class ULightComponent*> InteriorLights;
 
+	// Array of all moveables, sorted based on their gameplay tags
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
 		TMap < FName, FMoveablesList> Moveables;
 
-	// -- Ship Actives
+	// Array of all chairs in the ship, sorted based on their names (pilot, co-pilot)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
+		TMap < FName, class AShipChair*> Chairs;
+
+	/// -- Ship Actives
+	// True if the landing gear is down
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
 		bool bLandingGearDown = false;
 
+	// True if the exterior lights are on
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
 		bool bExLightsOn = true;
 
+	// True if the interior lights are on
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
 		bool bInLightsOn = true;
 
+	// True if the ship is in VTOL mode
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
 		bool bInVTOLMode = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Actives")
-		int doorsOpen = 0;
+	// int to count how many doors are open
+	int doorsOpen = 0;
+
+	/// -- Players in Ship
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players in Ship")
+		TMap < FName, class ABaseCharacter*> PlayersInSeats;
 };

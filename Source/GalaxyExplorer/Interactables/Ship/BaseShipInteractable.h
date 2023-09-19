@@ -19,11 +19,11 @@ public:
 
 	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 	virtual void OnCasted();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+		FName InteractableTags;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "References")
 		 ABaseShip* OwningShip = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
-		FName InteractableTags;
 };

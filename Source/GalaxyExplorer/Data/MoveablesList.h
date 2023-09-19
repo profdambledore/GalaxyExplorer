@@ -15,9 +15,11 @@ struct GALAXYEXPLORER_API FMoveablesList
 public:
 	GENERATED_BODY();
 
+	// Array of UShipMoveables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<class UShipMoveable*> Components;
 
+	// Constructors / Destructors
 	FMoveablesList();
 	FMoveablesList(UShipMoveable* InitialMoveable);
 	~FMoveablesList();

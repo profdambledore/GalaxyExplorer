@@ -7,6 +7,7 @@
 #include "Ship/LandingGear.h"
 #include "Ship/ShipLight.h"
 #include "Ship/ShipMoveable.h"
+#include "Interactables/Ship/ShipChair.h"
 
 // Sets default values
 ABaseShip::ABaseShip()
@@ -14,6 +15,7 @@ ABaseShip::ABaseShip()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Setup Components
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
 	ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ship Mesh"));
@@ -30,9 +32,17 @@ void ABaseShip::BeginPlay()
 	GetAttachedActors(childActors, true);
 
 	for (int i = 0; i < childActors.Num(); i++) {
-		if (childActors[i]->IsA(ABaseShipInteractable::StaticClass())) {
+		// If the interactable is a ship chair, then add it to the Chairs map and add
+		// a new index to the PlayersInSeats map
+		if (childActors[i]->IsA(AShipChair::StaticClass())) {
+			AShipChair* currentChair = Cast<AShipChair>(childActors[i]);
+			currentChair->SetOwningShip(this);
+			Chairs.Add(currentChair->InteractableTags, currentChair);
+			PlayersInSeats.Add(currentChair->InteractableTags, nullptr);
+		}
+		else if (childActors[i]->IsA(ABaseShipInteractable::StaticClass())) {
 			Interactables.Add(Cast<ABaseShipInteractable>(childActors[i]));
-			Interactables[i]->SetOwningShip(this);
+			Interactables[Interactables.Num() - 1]->SetOwningShip(this);
 		}
 	}
 
@@ -60,7 +70,6 @@ void ABaseShip::BeginPlay()
 		else if (foundLights[i]->ComponentHasTag("Interior")) {
 			InteriorLights.Add(Cast<ULightComponent>(foundLights[i]));
 		}
-		
 	}
 
 	// Get all ShipMoveables and sort them in the Moveables map based on their tags
@@ -79,6 +88,7 @@ void ABaseShip::BeginPlay()
 		}
 	}
 
+	// Toggle the exterior lights off and landing gear down on spawn
 	ToggleExteriorLights();
 	ToggleLandingGear();
 }
@@ -100,6 +110,7 @@ void ABaseShip::FlightReady()
 
 void ABaseShip::ToggleLandingGear()
 {
+	// Flip the bool and toggle all landing gears
 	bLandingGearDown = !bLandingGearDown;
 	for (int i = 0; i < LandingGears.Num(); i++) {
 		LandingGears[i]->ToggleLandingGear(bLandingGearDown);
@@ -108,6 +119,7 @@ void ABaseShip::ToggleLandingGear()
 
 void ABaseShip::ToggleExteriorLights()
 {
+	// Flip the bool and toggle all exterior lights
 	bExLightsOn = !bExLightsOn;
 	for (int i = 0; i < ExteriorLights.Num(); i++) {
 		ExteriorLights[i]->SetVisibility(bExLightsOn);
@@ -116,6 +128,7 @@ void ABaseShip::ToggleExteriorLights()
 
 void ABaseShip::ToggleInteriorLights()
 {
+	// Flip the bool and toggle all interior lights
 	bInLightsOn = !bInLightsOn;
 	for (int i = 0; i < InteriorLights.Num(); i++) {
 		InteriorLights[i]->SetVisibility(bInLightsOn);
@@ -124,32 +137,54 @@ void ABaseShip::ToggleInteriorLights()
 
 void ABaseShip::ToggleVTOLMode()
 {
+	// Flip the bool and toggle all VTOL gimbals
 	bInVTOLMode = !bInVTOLMode;
 	for (int i = 0; i < VTOLGimbals.Num(); i++) {
 		VTOLGimbals[i]->ToggleVTOLMode(bInVTOLMode);
 	}
 }
 
-void ABaseShip::ToggleMoveables(FName TagName)
+void ABaseShip::ToggleMoveables(FName TagName, bool bIsDoor)
 {
-	FMoveablesList* moveablesToModify = Moveables.Find(TagName);
-	for (int i = 0; i < moveablesToModify->Components.Num(); i++) {
-		doorsOpen += moveablesToModify->Components[i]->ToggleMoveable(1);
+	// Check if the inputted tag exists.  If it does, then...
+	if (Moveables.Contains(TagName)) {
+		// Get all of the moveables of the tag
+		FMoveablesList* moveablesToModify = Moveables.Find(TagName);
+		if (moveablesToModify) {
+			for (int i = 0; i < moveablesToModify->Components.Num(); i++) {
+				// If the input stated that the moveable was a door, modify the doorsOpen int
+				// and play/reverse the moveable
+				if (bIsDoor) {
+					doorsOpen += moveablesToModify->Components[i]->ToggleMoveable(1);
+				}
+				else {
+					// Play or reverse the moveable
+					moveablesToModify->Components[i]->ToggleMoveable(1);
+				}
+			}
+		}
 	}
 }
 
 void ABaseShip::CloseAllDoors()
 {
+	// Collect all moveables which have the Doors tag
 	FMoveablesList* moveablesToModify = Moveables.Find("Doors");
+
+	// Set stateToSet to 3, then change it to 2 if one or more doors are open
 	int stateToSet = 3;
 	if (doorsOpen != 0) {
 		stateToSet = 2;
 	}
+
+	// Set all doors to the calculated state (3 = open all / 2 = close all) 
 	for (int i = 0; i < moveablesToModify->Components.Num(); i++) {
 		doorsOpen += moveablesToModify->Components[i]->ToggleMoveable(stateToSet);
 	}
+
+	// Reset doorsOpen to 0 if it is less than 0
+	// Due to all doors being triggered, even the ones already closed
 	if (doorsOpen < 0) {
 		doorsOpen = 0;
 	}
 }
-

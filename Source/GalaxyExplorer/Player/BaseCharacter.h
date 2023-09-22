@@ -15,6 +15,7 @@
 #include "GameplayTagContainer.h"
 #include "Components/WidgetInteractionComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SpotLightComponent.h"
 
 #include "BaseCharacter.generated.h"
 
@@ -42,6 +43,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	/// --	Player
 	// Axis
 	void MoveX(float AxisValue);
 	void MoveY(float AxisValue);
@@ -57,9 +59,20 @@ protected:
 	void InteractModePrimaryPress();
 	void InteractModePrimaryRelease();
 	void ToggleCameraMode();
+	void ToggleTorch();
 
 	void JumpPress();
 	void JumpRelease();
+
+	/// -- Ship
+	// Action
+	void InShip_VTOLMode();
+	void InShip_LandingGear();
+	void InShip_ExteriorLights();
+	void InShip_InteriorLights();
+	void InShip_ExitSeat();
+	void InShip_FlightReady();
+	void InShip_PowerOn();
 
 	/// -- Interact
 	void QuickInteract();
@@ -90,6 +103,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		UWidgetInteractionComponent* WidgetInteractionComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+		USpotLightComponent* TorchComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 		class UShipInventoryComponent* ShipInventoryComponent;
@@ -160,4 +176,6 @@ public:
 	// The ship this player is currently seated in
 	ABaseShip* ShipSeatedIn;
 
+	/// -- Torch
+	bool bTorchOn = false;
 };

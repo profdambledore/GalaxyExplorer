@@ -19,6 +19,8 @@ public:
 	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 	virtual void OnCasted();
 
+	void UpdateButtonEnabled();
+
 
 public:
 	// Pointer to the chair this button is attached too

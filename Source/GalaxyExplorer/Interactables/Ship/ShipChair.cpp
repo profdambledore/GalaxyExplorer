@@ -4,10 +4,13 @@
 #include "Ship/BaseShip.h"
 #include "Player/BaseCharacter.h"
 #include "Interactables/Ship/ShipChairButton.h"
+#include "Data/ShipChairData.h"
 
 AShipChair::AShipChair() 
 {
 	// Setup the chairs components
+	SeatMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Seat Mesh"));
+
 	PlayerAttachmentPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Player Attachment Point"));
 	PlayerAttachmentPoint->SetupAttachment(Root, "");
 
@@ -39,6 +42,7 @@ void AShipChair::BeginPlay()
 
 void AShipChair::Interact(int InteractionValue, ABaseCharacter* Interactee)
 {
+	int chairIndex;
 	switch (InteractionValue) {
 	case 0:
 		// Toggle the state of the chairs moveable (if it has one)
@@ -47,8 +51,9 @@ void AShipChair::Interact(int InteractionValue, ABaseCharacter* Interactee)
 		Buttons[0]->bEnabled = true;
 
 		// Update the ships pointer to use the interactee
-		if (OwningShip->PlayersInSeats.Contains(InteractableTags)) {
-			OwningShip->PlayersInSeats.Add(InteractableTags, Interactee);
+		chairIndex = OwningShip->FindSeat(InteractableTags);
+		if (chairIndex != -1) {
+			OwningShip->Chairs[chairIndex].Player = Interactee;
 		}
 
 		// Remove Interactee collision and attach the interactee to the seat
@@ -73,8 +78,9 @@ void AShipChair::Interact(int InteractionValue, ABaseCharacter* Interactee)
 		Interactee->AttachToSeat(false, OwningShip);
 
 		// Update the ships pointer to use the interactee
-		if (OwningShip->PlayersInSeats.Contains(InteractableTags)) {
-			OwningShip->PlayersInSeats.Add(InteractableTags, nullptr);
+		chairIndex = OwningShip->FindSeat(InteractableTags);
+		if (chairIndex != -1) {
+			OwningShip->Chairs[chairIndex].Player = nullptr;
 		}
 
 		// Then update the Interactees interaction widget
@@ -89,4 +95,11 @@ void AShipChair::Interact(int InteractionValue, ABaseCharacter* Interactee)
 void AShipChair::OnCasted()
 {
 	
+}
+
+void AShipChair::UpdateButtons()
+{
+	for (int i = 0; i < Buttons.Num(); i++) {
+		Buttons[i]->UpdateButtonEnabled();
+	}
 }

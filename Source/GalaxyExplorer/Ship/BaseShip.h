@@ -10,6 +10,8 @@
 
 #include "Data/ShipData.h"
 #include "Data/MoveablesList.h"
+#include "Data/ThrusterData.h"
+#include "Data/ShipChairData.h"
 
 #include "BaseShip.generated.h"
 
@@ -26,7 +28,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-		void TurnShipOn();
+		void ToggleShipOn();
 
 	UFUNCTION(BlueprintCallable)
 		void FlightReady();
@@ -55,6 +57,10 @@ public:
 	// Toggles the state of all doors to be closed if one is open, or open if all are closed
 	UFUNCTION(BlueprintCallable)
 		void CloseAllDoors();
+
+	void RemoveCharacterFromSeat(class ABaseCharacter* CharacterToRemove);
+
+	int FindSeat(FName SeatName);
 
 protected:
 	// Called when the game starts or when spawned
@@ -98,8 +104,8 @@ public:
 		TMap < FName, FMoveablesList> Moveables;
 
 	// Array of all chairs in the ship, sorted based on their names (pilot, co-pilot)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ship Data")
-		TMap < FName, class AShipChair*> Chairs;
+	UPROPERTY(EditAnywhere, Category = "Ship Data")
+		TArray<FShipChairData> Chairs;
 
 	/// -- Ship Actives
 	// True if the landing gear is down
@@ -121,7 +127,11 @@ public:
 	// int to count how many doors are open
 	int doorsOpen = 0;
 
+	/// -- Ship Power
+	bool bPoweredOn = false;
+	bool bEnginesOn = false;
+
 	/// -- Players in Ship
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players in Ship")
-		TMap < FName, class ABaseCharacter*> PlayersInSeats;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players in Ship")
+		//TMap < FName, class ABaseCharacter*> PlayersInSeats;
 };

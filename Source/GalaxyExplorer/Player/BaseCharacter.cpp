@@ -5,6 +5,7 @@
 #include "Player/InteractWidget.h"
 #include "Player/ShipInventoryComponent.h"
 #include "Interactables/BaseInteractable.h"
+#include "Ship/BaseShip.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -34,6 +35,10 @@ ABaseCharacter::ABaseCharacter()
 	WidgetInteractionComponent->SetRelativeLocation(FVector(10.0f, 0.0f, 90.0f));
 	WidgetInteractionComponent->InteractionSource = EWidgetInteractionSource::Mouse;
 	WidgetInteractionComponent->SetupAttachment(FirstPersonCamera, "");
+
+	TorchComponent = CreateDefaultSubobject<USpotLightComponent>(TEXT("Torch Component"));
+	TorchComponent->SetupAttachment(FirstPersonCamera, "");
+	TorchComponent->SetVisibility(false);
 
 	ShipInventoryComponent = CreateDefaultSubobject<UShipInventoryComponent>(TEXT("Ship Inventory Component"));
 
@@ -135,6 +140,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// On Foot Binds
 	// Add Axis Binds
 	PlayerInputComponent->BindAxis("MoveX", this, &ABaseCharacter::MoveX);
 	PlayerInputComponent->BindAxis("MoveY", this, &ABaseCharacter::MoveY);
@@ -152,6 +158,14 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("SwapCamera", IE_Released, this, &ABaseCharacter::ToggleCameraMode);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ABaseCharacter::JumpPress);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ABaseCharacter::JumpRelease);
+	PlayerInputComponent->BindAction("ToggleTorch", IE_Released, this, &ABaseCharacter::ToggleTorch);
+
+	// In Ship Binds
+	PlayerInputComponent->BindAction("InShip_ToggleVTOL", IE_Released, this, &ABaseCharacter::InShip_VTOLMode);
+	PlayerInputComponent->BindAction("InShip_ToggleLandingGear", IE_Released, this, &ABaseCharacter::InShip_LandingGear);
+	PlayerInputComponent->BindAction("InShip_ToggleExteriorLights", IE_Released, this, &ABaseCharacter::InShip_ExteriorLights);
+	PlayerInputComponent->BindAction("InShip_ToggleInteriorLights", IE_Released, this, &ABaseCharacter::InShip_InteriorLights);
+	PlayerInputComponent->BindAction("InShip_ExitSeat", IE_Released, this, &ABaseCharacter::InShip_ExitSeat);
 }
 
 // --- Movement ---
@@ -238,7 +252,81 @@ void ABaseCharacter::JumpRelease()
 		ACharacter::StopJumping();
 	}
 }
+
+void ABaseCharacter::ToggleTorch()
+{
+	// Check if we are in a seat.  If not so...
+	if (!ShipSeatedIn)
+	{
+		//TorchComponent->SetActive(!TorchComponent->IsActive(), false);
+		bTorchOn = !bTorchOn;
+		TorchComponent->SetVisibility(bTorchOn);
+	}
+}
 	
+
+void ABaseCharacter::InShip_VTOLMode()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		ShipSeatedIn->ToggleVTOLMode();
+	}
+}
+
+void ABaseCharacter::InShip_LandingGear()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		ShipSeatedIn->ToggleLandingGear();
+	}
+}
+
+void ABaseCharacter::InShip_ExteriorLights()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		ShipSeatedIn->ToggleExteriorLights();
+	}
+}
+
+void ABaseCharacter::InShip_InteriorLights()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		ShipSeatedIn->ToggleInteriorLights();
+	}
+}
+
+void ABaseCharacter::InShip_ExitSeat()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		ShipSeatedIn->RemoveCharacterFromSeat(this);
+	}
+}
+
+void ABaseCharacter::InShip_FlightReady()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		
+	}
+}
+
+void ABaseCharacter::InShip_PowerOn()
+{
+	// Check if we are in a seat.  If not so...
+	if (ShipSeatedIn)
+	{
+		
+	}
+}
 
 void ABaseCharacter::FocusCamera(float AxisValue)
 {
@@ -338,6 +426,7 @@ void ABaseCharacter::InteractModeRelease()
 		// Hide mouse cursor 
 		LastInteractedObject = nullptr;
 		PC->bShowMouseCursor = false;
+		PC->SetInputMode(FInputModeGameOnly());
 		InteractWidgetComponent->SetVisibility(false, false);
 		InteractWidget->ClearInteractionList();
 	}
@@ -398,21 +487,24 @@ void ABaseCharacter::AttachToInteractable(AActor* ActorToAttachTo)
 
 void ABaseCharacter::UpdateInteractWidget()
 {
-	// Set the size of the widget to the LastInteractedObject's widget scale
-	InteractWidgetComponent->SetRelativeScale3D(LastInteractedObject->WidgetScale);
+	if (LastInteractedObject) {
+		// Set the size of the widget to the LastInteractedObject's widget scale
+		InteractWidgetComponent->SetRelativeScale3D(LastInteractedObject->WidgetScale);
 
-	// Get the map of interation points based on if the object is enabled or not
-	if (LastInteractedObject.Get()->bEnabled == true) {
-		InteractWidget->InterationMap = LastInteractedObject->InterationPoints;
-	}
-	else {
-		InteractWidget->InterationMap = LastInteractedObject->InterationPointsPowerOff;
-	}
+		// Get the map of interation points based on if the object is enabled or not
+		if (LastInteractedObject.Get()->bEnabled == true) {
+			InteractWidget->InterationMap = LastInteractedObject->InterationPoints;
+		}
+		else {
+			InteractWidget->InterationMap = LastInteractedObject->InterationPointsPowerOff;
+		}
 
-	// Call function UpdateInteractionList and show the InteractWidgetComponent
-	InteractWidget->UpdateInteractionList();
-	InteractWidget->InteractionFocused = LastInteractedObject.Get();
-	InteractWidgetComponent->SetVisibility(true, true);
+		// Call function UpdateInteractionList and show the InteractWidgetComponent
+		InteractWidget->UpdateInteractionList();
+		InteractWidget->InteractionFocused = LastInteractedObject.Get();
+		InteractWidgetComponent->SetVisibility(true, true);
+	}
+	
 }
 
 void ABaseCharacter::AttachToSeat(bool bAttach, ABaseShip* ShipAttachingTo)

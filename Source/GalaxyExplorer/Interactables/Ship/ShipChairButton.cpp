@@ -19,6 +19,21 @@ void AShipChairButton::Interact(int InteractionValue, ABaseCharacter* Interactee
 		Interactee->UpdateInteractWidget();
 		break;
 
+	case 1:
+		// Toggle the state of the ships power
+		OwningShip->ToggleShipOn();
+
+		// Then update the Interactees interaction widget
+		Interactee->UpdateInteractWidget();
+		break;
+
+	case 2:
+		OwningShip->FlightReady();
+
+		// Then update the Interactees interaction widget
+		Interactee->UpdateInteractWidget();
+		break;
+
 	default:
 		break;
 	}
@@ -27,4 +42,14 @@ void AShipChairButton::Interact(int InteractionValue, ABaseCharacter* Interactee
 void AShipChairButton::OnCasted()
 {
 
+}
+
+void AShipChairButton::UpdateButtonEnabled()
+{
+	if (InteractableTags == "FlightReady") {
+		bEnabled = OwningShip->bEnginesOn;
+	}
+	else if (InteractableTags == "PowerOn") {
+		bEnabled = OwningShip->bPoweredOn;
+	}
 }

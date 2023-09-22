@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Interactables/Ship/BaseShipInteractable.h"
+
+#include "Components/StaticMeshComponent.h"
+
 #include "ShipChair.generated.h"
 
 /**
@@ -24,8 +27,13 @@ public:
 	virtual void Interact(int InteractionValue, ABaseCharacter* Interactee);
 	virtual void OnCasted();
 
+	void UpdateButtons();
+
 public:
 	/// -- Components
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UStaticMeshComponent* SeatMesh;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		USceneComponent* PlayerAttachmentPoint;
 

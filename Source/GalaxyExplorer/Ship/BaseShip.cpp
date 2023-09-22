@@ -37,8 +37,8 @@ void ABaseShip::BeginPlay()
 		if (childActors[i]->IsA(AShipChair::StaticClass())) {
 			AShipChair* currentChair = Cast<AShipChair>(childActors[i]);
 			currentChair->SetOwningShip(this);
-			Chairs.Add(currentChair->InteractableTags, currentChair);
-			PlayersInSeats.Add(currentChair->InteractableTags, nullptr);
+			Chairs.Add(FShipChairData(currentChair->InteractableTags, currentChair));
+			//PlayersInSeats.Add(currentChair->InteractableTags, nullptr);
 		}
 		else if (childActors[i]->IsA(ABaseShipInteractable::StaticClass())) {
 			Interactables.Add(Cast<ABaseShipInteractable>(childActors[i]));
@@ -100,12 +100,14 @@ void ABaseShip::Tick(float DeltaTime)
 
 }
 
-void ABaseShip::TurnShipOn()
+void ABaseShip::ToggleShipOn()
 {
+	//AShipChair* pilotChair = Chairs.FindRef("PilotSeat");
 }
 
 void ABaseShip::FlightReady()
 {
+	
 }
 
 void ABaseShip::ToggleLandingGear()
@@ -187,4 +189,23 @@ void ABaseShip::CloseAllDoors()
 	if (doorsOpen < 0) {
 		doorsOpen = 0;
 	}
+}
+
+void ABaseShip::RemoveCharacterFromSeat(ABaseCharacter* CharacterToRemove)
+{
+	for (int i = 0; i < Chairs.Num(); i++) {
+		if (Chairs[i].Player == CharacterToRemove) {
+			Chairs[i].Chair->Interact(1, CharacterToRemove);
+		}
+	}
+}
+
+int ABaseShip::FindSeat(FName SeatName)
+{
+	for (int i = 0; i < Chairs.Num(); i++) {
+		if (Chairs[i].Name == SeatName) {
+			return i;
+		}
+	}
+	return -1;
 }

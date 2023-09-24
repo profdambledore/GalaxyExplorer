@@ -19,10 +19,16 @@ ShipChairButtons now have UpdateButtonEnabled function, which is used to change 
 
 Added ShipChairData struct, has FName, ShipChair* and BaseCharatcer* properties
 
-  
 </td></tr></tr></table> 
 
+## Latest Dev Video
+
+<table><tr><td valign="center" width="100%">
  
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/D7DjRkftFK8/0.jpg)](https://www.youtube.com/watch?v=D7DjRkftFK8 "Ship Doors")
+
+</td></tr></tr></table> 
+
 ## Project Document
 
 [Link](https://github.com/profdambledore/GalaxyExplorer/blob/main/Docs/Galaxy_Explorer.pdf)

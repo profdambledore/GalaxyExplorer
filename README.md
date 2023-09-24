@@ -2,6 +2,10 @@
 
 Galaxy Explorer is a challenge that I set for myself to re-create Star Citizen's Ship system in Unreal Engine 4.  This includes the interaction system - where players can hold 'F' to enter interact mode and click on objects - and the port system - where players use Fleet Managers to spawn and store ships at various locations
 
+<p align="center">
+  <img src="https://github.com/profdambledore/FoodGame/blob/main/Docs/introImage.jpeg" />
+</p>
+
 ## Latest Update
 <table><tr><td valign="center" width="100%">
  

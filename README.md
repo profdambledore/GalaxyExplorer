@@ -29,7 +29,7 @@ Added ShipChairData struct, has FName, ShipChair* and BaseCharatcer* properties
 
 <table><tr><td valign="center" width="100%">
  
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/D7DjRkftFK8/0.jpg)](https://www.youtube.com/watch?v=D7DjRkftFK8 "Ship Doors")
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/ZvMOMUe8t3E/0.jpg)](https://www.youtube.com/watch?v=ZvMOMUe8t3E "Project as of October 23")
 
 </td></tr></tr></table> 
 
